@@ -1,0 +1,40 @@
+"Temperature assignments determined by looking at input files for the three 5Q runs, i.e. AR_5QCS.dat and AR_5Q-CL.OUT",,
+,These identify river miles at which records were calculated; records calculated at river miles within limits of anadromy were chosen,
+,Based on FlowWest's GIS data on limits of anadromy,
+Rivers that are modeled in HEC-5Q:,,
+DSM Name,Match,Notes
+American River,WILLIAM POND PARK in SSJB_AR_Reference_063015/AR/AR_CL_Temp.dss,"Sadie's e-mail said 30 miles starting at confluence; the record is defined as river mile 14, so centrally located within limits. The American River model ends 9 months earlier than the others for some reason…"
+Clear Creek,IGO in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Igo has been a location we've used before so I think it's a safe pick; 10 miles up from confluence, according to 5Q"
+Upper Sacramento River,COTTONWOOD CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Noted as Keswick to Red Bluff, 59 mile length, confirmed in 5Q as rm 302 to 243. Chose a record toward the middle of that stretch"
+Upper-mid Sacramento River,STONY CREEK in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Noted as Red Bluff to Wilkins Slough, 122 mile length, confirmed in 5Q as going down from rm 243. Chose a record toward the middle of that stretch"
+Lower-mid Sacramento River,KNIGHTS LDG in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Noted as Wilkins Slough to American, 58 mile length, confirmed in 5Q,  chose a record toward middle of this area i.e. ~30 river miles south of Wilkins Slough"
+Battle Creek,BATTLE CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Provided as an INFLOW_TEMP record, so it represents temperature in stream at confluence with Sacramento, but it's the only data we have and hopefully will have some relevance to zones of anadromy, which sometimes include the mouth… There's also a Butte Creek entry but it's broken, it just has 32F for every time period..."
+Cottonwood Creek,COTTONWOOD CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Provided as an INFLOW_TEMP record, so it represents temperature in stream at confluence with Sacramento, but it's the only data we have and hopefully will have some relevance to zones of anadromy, which sometimes include the mouth… There's also a Butte Creek entry but it's broken, it just has 32F for every time period..."
+Cow Creek,COW CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Provided as an INFLOW_TEMP record, so it represents temperature in stream at confluence with Sacramento, but it's the only data we have and hopefully will have some relevance to zones of anadromy, which sometimes include the mouth… There's also a Butte Creek entry but it's broken, it just has 32F for every time period..."
+Stony Creek,STONY CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Provided as an INFLOW_TEMP record, so it represents temperature in stream at confluence with Sacramento, but it's the only data we have and hopefully will have some relevance to zones of anadromy, which sometimes include the mouth… There's also a Butte Creek entry but it's broken, it just has 32F for every time period..."
+Thomes Creek,THOMES CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS,"Provided as an INFLOW_TEMP record, so it represents temperature in stream at confluence with Sacramento, but it's the only data we have and hopefully will have some relevance to zones of anadromy, which sometimes include the mouth… There's also a Butte Creek entry but it's broken, it just has 32F for every time period..."
+San Joaquin River,ABV TUOL in SSJB_SJR_Reference_062915/SJR/SJR_CL_TEMP.DSS,"Noted as Merced confluence to Vernalis, 45 mile length, confirmed in 5Q, chose closest record to middle of this area i.e. ~30 miles south of merced confluence"
+Stanislaus River,BLW MCHENRY BR in SSJB_SJR_Reference_062915/SJR/SJR_CL_TEMP.DSS,Noted as the bottom 60 miles of the river; chose closest record to middle of this area i.e. ~30 miles upstream from confluence
+Merced,SANTA FE BR in SSJB_SJR_Reference_062915/SJR/SJR_CL_TEMP.DSS,Noted as the bottom 52 miles of the river; chose closest record to middle of this area i.e. ~25 miles upstream from confluence
+Tuolumne,GEER ROAD BR in SSJB_SJR_Reference_062915/SJR/SJR_CL_TEMP.DSS,Noted as the full river from confluence to Don Pedroo; chose closest record to middle of this area i.e. ~28 miles upstream from confluence
+,,
+Rivers/DSM areas that aren't modeled in HEC-5Q:,,
+Yuba River,,
+Yolo Bypass,,
+South Delta,,
+Paynes Creek,,
+North Delta,,
+Mokelumne River,,
+Mill Creek,,Notes
+Lower Sacramento River,,The 5Q Sacramento model only goes down to the Feather River confluence so the American to Freeport range noted is NOT within the bounds of the 5Q model! Normally I'll just leave such things out of the model but for the mainstem ones I would've expected to be in the model I'm making a special note...
+Feather River,,
+Elder Creek,,
+Deer Creek,,
+Cosumnes River,,
+Central Delta,,
+Calaveras River,,
+Butte Creek,,
+Big Chico Creek,,
+Bear River,,
+Bear Creek,,
+Antelope Creek,,
