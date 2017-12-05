@@ -35,6 +35,6 @@ chico_avg_temp <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715
 View(chico_avg_temp$data)
 
 chico_avg <- rnoaa::ncdc(datasetid = 'GHCND', stationid = 'GHCND:USC00041715', startdate = '1980-01-01',
-                        enddate = '1980-12-31', token = token, limit = 370)
+                        enddate = '1980-12-31', token = token, limit = 370, datatypeid = c('TMIN', 'TMAX'))
 
 View(chico_avg$data)
