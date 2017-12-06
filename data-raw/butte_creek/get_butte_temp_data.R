@@ -37,4 +37,12 @@ View(chico_avg_temp$data)
 chico_avg <- rnoaa::ncdc(datasetid = 'GHCND', stationid = 'GHCND:USC00041715', startdate = '1980-01-01',
                         enddate = '1980-12-31', token = token, limit = 370, datatypeid = c('TMIN', 'TMAX'))
 
-View(chico_avg$data)
+chico_avg$data %>%
+  mutate(date = ymd_hms(date), temp_c = value * .1) %>%
+  select(date, temp_c, datatype) %>%
+  spread(datatype, temp_c) %>%
+  mutate(t_avg_derived = (TMAX + TMIN) / 2) %>%
+  ggplot(aes(x = date, y = t_avg_derived)) +
+  geom_col()
+
+# issues with missing data from air temp gage... look for surrounding gages
