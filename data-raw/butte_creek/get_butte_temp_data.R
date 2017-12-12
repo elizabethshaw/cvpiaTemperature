@@ -129,10 +129,13 @@ confusionMatrix(xtab)
 # chico univ farm, between chico and durham, GHCND:USC00041715, too much missing data
 # de sabla, GHCND:USC00042402 too north east
 # paradise GHCND:USC00046685, most appropriate for butte creek rearing extent
-paradise <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
+paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
                         datatypeid = 'TAVG', enddate = '1989-12-31', token = token, limit = 120)
 
-paradise$data %>%
+paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
+                        datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
+paradise3$data %>%
+  bind_rows(paradise4$data) %>%
   mutate(date = ymd_hms(date), year = year(date),
          month = factor(month.abb[month(date)],
                         levels = c(month.abb[10:12], month.abb[1:9]), ordered = TRUE)) %>%
@@ -144,8 +147,44 @@ paradise$data %>%
   theme_minimal()
 
 # data for setting modeled values
-paradise$data %>%
-  mutate(date = ymd_hms(date)) %>%
-  select(date, monthly_avg_air_temp_c = value) %>%
-  mutate(water_exceed18 = monthly_avg_air_temp_c >= air_temp_thresholds[[1]],
-         water_exceed20 = monthly_avg_air_temp_c >= air_temp_thresholds[[2]])
+butte_air <- paradise3$data %>%
+  bind_rows(paradise4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, monthly_avg_air_temp_c = value)
+
+predicted_water_temp_c <- predict(butte_model, butte_air)
+
+butte_air$predicted_water_temp_c <- predicted_water_temp_c
+
+years_with_missing_months <- butte_air %>%
+  group_by(year = year(date)) %>%
+  summarise(missing_months = 12 - n()) %>%
+  filter(missing_months > 0) %>%
+  pull(year)
+
+fake_dates <- tibble(year = rep(years_with_missing_months, each = 12),
+                     month = rep(1:12, times = length(years_with_missing_months)))
+
+missing_air_temp_data <- butte_air %>%
+  filter(year(date) %in% years_with_missing_months) %>%
+  mutate(year = year(date), month = month(date)) %>%
+  select(year, month) %>%
+  bind_rows(fake_dates) %>%
+  group_by(year, month) %>%
+  summarise(count = n()) %>%
+  filter(count < 2) %>%
+  ungroup() %>%
+  mutate(date = ymd(paste(year, month, '01', sep = '-')),
+         monthly_avg_air_temp_c = NA,
+         predicted_water_temp_c = NA) %>%
+  select(date, monthly_avg_air_temp_c, predicted_water_temp_c)
+
+modeled_butte_water_temp_c <- butte_air %>%
+  bind_rows(missing_air_temp_data) %>%
+  arrange(date)
+
+modeled_butte_water_temp_c %>%
+  ggplot(aes(x = date, y = predicted_water_temp_c)) +
+  geom_col() +
+  geom_hline(yintercept = 18, alpha = .3) +
+  geom_hline(yintercept = 20, alpha = .3)
