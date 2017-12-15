@@ -46,5 +46,14 @@ big_chico_water_temp %>%
 # air temperature data near
 token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
 
+chico <- rnoaa::ncdc(datasetid = 'GSOM', locationid = 'CITY:US060005',datatypeid = 'TAVG',
+                     startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 1000)
 
+chico$data %>%
+  group_by(station) %>%
+  summarise(n())
 
+# 2 GHCND:USC00042402   119
+# 3 GHCND:USC00046685   117
+# 4 GHCND:USR0000CCHC   119
+# 5 GHCND:USR0000CCOH   120
