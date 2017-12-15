@@ -118,8 +118,6 @@ butte %>%
          water_exceed20 = monthly_avg_air_temp_c >= air_temp_thresholds[[2]]) %>%
   View()
 
-
-
 pred <- broom::augment(butte_model) %>% pull(.fitted)
 truth <- butte$monthly_avg_water_temp_c
 xtab <- table(pred > 18, truth > 18)
@@ -188,3 +186,5 @@ modeled_butte_water_temp_c %>%
   geom_col() +
   geom_hline(yintercept = 18, alpha = .3) +
   geom_hline(yintercept = 20, alpha = .3)
+
+# imputation by rule of thumb: if sandwiched by exceedance, exceed
