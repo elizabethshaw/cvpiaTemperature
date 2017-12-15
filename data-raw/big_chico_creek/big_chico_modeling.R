@@ -171,6 +171,7 @@ miss <- modeled_big_chico_water_temp_c %>%
 
 mod_big_chico_water_temp_c <- modeled_big_chico_water_temp_c %>%
   filter(!is.na(predicted_water_temp_c)) %>%
-  bind_rows(miss)
+  bind_rows(miss) %>%
+  arrange(date)
 
 write_rds(mod_big_chico_water_temp_c, 'data-raw/big_chico_creek/modeled_big_chico_temps.rds')
