@@ -70,3 +70,16 @@ mill_creek %>%
 
 mill_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = mill_creek)
 summary(mill_temp_model)
+
+red_bluff3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                         startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                          startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+
+red_bluff3$data %>%
+  bind_rows(red_bluff4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col()
+#data gaps
