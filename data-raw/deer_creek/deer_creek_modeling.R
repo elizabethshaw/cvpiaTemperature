@@ -62,3 +62,4 @@ air_temp_thersholds <- (bad_water_temps - b0) / b1
 
 # no temp during 1980-1999 near by
 # GHCND:USC00041715 closest or paradise again?
+# TODO ask mark
