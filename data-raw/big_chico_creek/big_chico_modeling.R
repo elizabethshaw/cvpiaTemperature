@@ -3,11 +3,40 @@ library(lubridate)
 library(rnoaa)
 library(CDECRetrieve)
 
-# big chico BIC cdec query 12/14/2017
+# # big chico BIC cdec query 12/14/2017----------------
 # bic <- cdec_query(stations = 'BIC', sensor_num = '25', dur_code = 'H',
 #            start_date = '1998-09-10', end_date = '2014-12-01')
 #
-# write_rds(bic, 'data-raw/big_chico_creek/bic.rds')
+# # write_rds(bic, 'data-raw/big_chico_creek/bic.rds')
+# rnoaa query 12/14/2017----------------
+# token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
+# chico <- rnoaa::ncdc(datasetid = 'GSOM', locationid = 'CITY:US060005', datatypeid = 'TAVG',
+#                      startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 1000)
+#
+# chico$data %>%
+#   group_by(station) %>%
+#   summarise(n())
+#
+# 2 GHCND:USC00042402   119
+# 3 GHCND:USC00046685   117
+# 4 GHCND:USR0000CCHC   119
+# 5 GHCND:USR0000CCOH   120
+#
+# cohasset (USR0000CCOH) best location but doesn't have data 1980-1999, look at next best station paradise (USC00046685)
+# paradise1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', datatypeid = 'TAVG',
+#                          startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
+#
+# paradise2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', datatypeid = 'TAVG',
+#                          startdate = '2008-01-01', enddate = '2014-12-31', token = token, limit = 130)
+# write_rds(paradise1, 'data-raw/big_chico_creek/paradise1.rds')
+# write_rds(paradise2, 'data-raw/big_chico_creek/paradise2.rds')
+# paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
+#                          datatypeid = 'TAVG', enddate = '1989-12-31', token = token, limit = 120)
+#
+# paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
+#                          datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
+# write_rds(paradise3, 'data-raw/big_chico_creek/paradise3.rds')
+# write_rds(paradise4, 'data-raw/big_chico_creek/paradise4.rds')
 
 bic <- read_rds('data-raw/big_chico_creek/bic.rds')
 
@@ -42,28 +71,13 @@ big_chico_water_temp <- bic %>%
 big_chico_water_temp %>%
   summarise(min = min(date), max = max(date), max-min)
 
-
-# air temperature data near
-token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
-
-chico <- rnoaa::ncdc(datasetid = 'GSOM', locationid = 'CITY:US060005', datatypeid = 'TAVG',
-                     startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 1000)
-
-chico$data %>%
-  group_by(station) %>%
-  summarise(n())
-
-# 2 GHCND:USC00042402   119
-# 3 GHCND:USC00046685   117
-# 4 GHCND:USR0000CCHC   119
-# 5 GHCND:USR0000CCOH   120
-
-# cohasset (USR0000CCOH) best location but doesn't have data 1980-1999, look at next best station paradise (USC00046685)
-paradise1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', datatypeid = 'TAVG',
-                         startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
-
-paradise2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', datatypeid = 'TAVG',
-                         startdate = '2008-01-01', enddate = '2014-12-31', token = token, limit = 130)
+# read saved query-------------------
+# air temps for training model
+paradise1 <- read_rds('data-raw/big_chico_creek/paradise1.rds')
+paradise2 <- read_rds('data-raw/big_chico_creek/paradise2.rds')
+# air temps for predicting water temps
+paradise3 <- read_rds('data-raw/big_chico_creek/paradise3.rds')
+paradise4 <- read_rds('data-raw/big_chico_creek/paradise4.rds')
 
 big_chico_air_temp <- paradise1$data %>%
   bind_rows(paradise2$data) %>%
@@ -101,12 +115,6 @@ truth <- big_chico$mean_water_temp_c
 xtab <- table(pred > 18, truth > 18)
 xtab <- table(pred > 20, truth > 20)
 confusionMatrix(xtab)
-
-paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
-                         datatypeid = 'TAVG', enddate = '1989-12-31', token = token, limit = 120)
-
-paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
-                         datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
 
 paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
@@ -149,10 +157,20 @@ modeled_big_chico_water_temp_c %>%
     predicted_water_temp_c > 18 ~ 'over 18',
     TRUE ~ 'none'
   )) %>%
-  filter(month(date) < 9, is.na(predicted_water_temp_c)) %>% glimpse()
   ggplot(aes(x = date, y = predicted_water_temp_c, fill = exceed)) +
   geom_col() +
   geom_hline(yintercept = 18, alpha = .3) +
   geom_hline(yintercept = 20, alpha = .3) +
   scale_fill_manual(values = c('#969696', '#feb24c', '#bd0026')) +
   theme_minimal()
+
+# imputation by eyeball: if sandwiched by exceedance, exceed
+miss <- modeled_big_chico_water_temp_c %>%
+  filter(is.na(predicted_water_temp_c)) %>%
+  mutate(predicted_water_temp_c = c(9, 21, 19, 9, 7, 19, 21))
+
+mod_big_chico_water_temp_c <- modeled_big_chico_water_temp_c %>%
+  filter(!is.na(predicted_water_temp_c)) %>%
+  bind_rows(miss)
+
+write_rds(mod_big_chico_water_temp_c, 'data-raw/big_chico_creek/modeled_big_chico_temps.rds')

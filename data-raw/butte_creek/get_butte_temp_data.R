@@ -12,10 +12,11 @@ library(caret)
 # write_rds(butte_nr_durham, 'data-raw/butte_creek/butte_nr_durham.rds')
 # data only available 1998-1999, weird website says more data available
 
-# hourly water temperature data on butte creek near chico (fahrenheit)
+# hourly water temperature data on butte creek near chico (fahrenheit) 09/16/1998 to present
 # butte_nr_chico <- CDECRetrieve::cdec_query(stations = 'BCK', sensor_num = '25', dur_code = 'H',
                                            # start_date = '1998-09-16', end_date = '2017-09-30')
 
+#07/29/1998 to present
 bcd <- CDECRetrieve::cdec_query(stations = 'BCD', sensor_num = '25', dur_code = 'H',
                                            start_date = '1998-09-16', end_date = '2017-09-30')
 
