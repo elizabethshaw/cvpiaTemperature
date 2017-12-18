@@ -6,106 +6,101 @@ library(caret)
 
 token <- Sys.getenv("token")
 
-moke_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11325500', parameterCd = '00010', statCd = c('00001', '00002'),
-                          startDate = '1966-01-01', endDate = '1975-12-31')
+moke_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11325500', parameterCd = '00010',
+                                             statCd = c('00001', '00002'),
+                                             startDate = '1966-01-01', endDate = '1975-12-31')
 
 glimpse(moke_water_temp)
+moke_water_temp %>%
+  select(date = Date, max = X_00010_00001, min = X_00010_00002) %>%
+  ggplot(aes(x = date, y = max)) +
+  geom_col()
 
-water_temp <- moke_water_temp %>%
-  select(date = Date, max_tempC = X_00010_00001, min_tempC = X_00010_00002) %>%
+moke_wt <- moke_water_temp %>%
+  select(date = Date, max = X_00010_00001, min = X_00010_00002) %>%
+  mutate(water_temp_c = (max + min) / 2) %>%
   group_by(year = year(date), month = month(date)) %>%
-  summarise(max_tempC = mean(max_tempC, na.rm = TRUE), min_tempC = mean(min_tempC, na.rm = TRUE),
-            mean_water_tempC = mean(c(max_tempC, min_tempC))) %>%
+  summarise(mean_water_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
   ungroup() %>%
-  mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
-  mutate(mean_water_tempF = mean_water_tempC * 9/5 + 32) %>%
-  select(date, mean_water_tempF)
+  mutate(date = ymd(paste(year, month, 1, sep = '-'))) %>%
+  select(date, mean_water_temp_c)
+
+moke_wt %>% summarise(min(date), max(date))
 
 # temp at lodi
-test2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-                     startdate = '1994-08-01', enddate = '2003-12-31', limit = 120, token = token)
-
-test1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-                     startdate = '2004-01-01', enddate = '2013-12-31', limit = 120, token = token)
-
-
-
-lodi_air_temp <- test2$data %>%
+lodi1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '1966-01-01', enddate = '1975-12-31', limit = 120, token = token)
+write_rds(lodi1, 'data-raw/mokelumne_river/lodi1.rds')
+lodi1 <- read_rds('data-raw/mokelumne_river/lodi1.rds')
+moke_at <- lodi1$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
-  select(date, avg_tempC = value)
+  select(date, mean_air_temp_c = value)
 
-lodi_air_temp %>%
-  group_by(year = year(date)) %>%
-  summarise(n())
+moke <- moke_wt %>%
+  left_join(moke_at)
 
-View(lodi_air_temp)
-training <- water_temp %>%
-  left_join(s_air_temp)
+moke %>%
+  ggplot(aes(x = mean_air_temp_c, y = mean_water_temp_c)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE)
 
-cor(training$mean_water_tempF, training$mean_air_tempF)
+cor(x = moke$mean_air_temp_c, y = moke$mean_water_temp_c)
 
-temp_model_moke <- lm(mean_water_tempF ~ mean_air_tempF, data = training)
+temp_model_moke <- lm(mean_air_temp_c ~ mean_water_temp_c, data = moke)
 summary(temp_model_moke)
 
-bad_water_temps <- c(64.4, 68)
+bad_water_temps <- c(18, 20)
 b0 <- temp_model_moke$coefficients[[1]]
 b1 <- temp_model_moke$coefficients[[2]]
 
 air_temp_thersholds <- (bad_water_temps - b0) / b1
 
-training %>%
-  ggplot(aes(x = mean_air_tempF, y = mean_water_tempF)) +
-  geom_point() +
-  geom_smooth(method = 'lm', se = FALSE) +
-  geom_point(pch = 1) +
-  theme_minimal() +
-  labs(x = 'monthly mean air temperature (°F)',
-       y = 'monthly mean water temperature (°F)') +
-  theme(text = element_text(size = 18)) +
-  geom_hline(yintercept = 64.4, linetype = 2, color = 'red') +
-  geom_hline(yintercept = 68, linetype = 2, color = 'red') +
-  annotate('text', x = 50, y = 64.4 + 1, size = 6,
-           label = 'Above 18°C') +
-  annotate('text', x = 50, y = 68 + 1, size = 6,
-           label = 'Above 20°C')
-
 
 # temperature data from Mike Urkov---------------------
 frandy <- read_csv('data-raw/mokelumne_river/Frandy15min.csv')
-
-frandy_water_temp <- freddy %>%
-  mutate(date = as.Date(date, '%H:%M:%S %m/%d/%Y'),
-         water_tempF = water_tempC * 9/5 + 32) %>%
+frandy_mean_temps <- frandy %>%
+  mutate(date = as.Date(date, '%H:%M:%S %m/%d/%Y')) %>%
   group_by(year = year(date), month = month(date)) %>%
-  summarise(mean_water_tempF = mean(water_tempF, na.rm = TRUE)) %>%
+  summarise(mean_water_temp_c = mean(water_tempC, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
-  select(date, mean_water_tempF)
+  select(date, mean_water_temp_c)
+
+frandy_mean_temps %>% summarise(min(date), max(date))
+
 
 #Lodi
-lodi_air_temp <- climate_data(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-                                  startdate = '1994-08-01', enddate = '2003-12-31', limit = 120)
+# lodi2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+#                      startdate = '1994-01-01', enddate = '2003-12-31', limit = 120, token = token)
+#
+# lodi3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+#                      startdate = '2004-01-01', enddate = '2013-12-31', limit = 120, token = token)
+# write_rds(lodi2, 'data-raw/mokelumne_river/lodi2.rds')
+# write_rds(lodi3, 'data-raw/mokelumne_river/lodi3.rds')
+lodi2 <- read_rds('data-raw/mokelumne_river/lodi2.rds')
+lodi3 <- read_rds('data-raw/mokelumne_river/lodi3.rds')
 
-air_temp <- lodi_air_temp$data %>%
+lodi2$data %>%
+  bind_rows(lodi3$data) %>%
+  select(date, mean_air_temp_c = value) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
-  select(date, mean_air_tempF = value)
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col()
 
-validate <- left_join(air_temp, freddy_water_temp)
+# lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+#                      startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
+#
+# lodi5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+#                      startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
+# write_rds(lodi4, 'data-raw/mokelumne_river/lodi4.rds')
+# write_rds(lodi5, 'data-raw/mokelumne_river/lodi5.rds')
 
-pred_values <- predict(temp_model_moke, validate)
+lodi4 <- read_rds('data-raw/mokelumne_river/lodi4.rds')
+lodi5 <- read_rds('data-raw/mokelumne_river/lodi5.rds')
 
-pred_above_18 <-  pred_values > bad_water_temps[[1]]
-above_18 <- validate$mean_water_tempF > bad_water_temps[[1]]
-
-xtab18 <- table(pred_above_18, above_18)
-
-confusionMatrix(xtab18)
-
-pred_above_20 <-  pred_values > bad_water_temps[[2]]
-above_20 <- validate$mean_water_tempF > bad_water_temps[[2]]
-
-xtab20 <- table(pred_above_20, above_20)
-
-confusionMatrix(xtab20)
-
-temp_model_moke %>% broom::augment() %>% View()
+lodi4$data %>%
+  bind_rows(lodi5$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col()
