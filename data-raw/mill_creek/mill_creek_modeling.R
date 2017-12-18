@@ -71,10 +71,15 @@ mill_creek %>%
 mill_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = mill_creek)
 summary(mill_temp_model)
 
-red_bluff3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-                         startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
-red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-                          startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+# red_bluff3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+#                          startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+# red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+#                           startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+# write_rds(red_bluff3, 'data-raw/mill_creek/red_bluff3.rds')
+# write_rds(red_bluff4, 'data-raw/mill_creek/red_bluff4.rds')
+
+red_bluff3 <- read_rds('data-raw/mill_creek/red_bluff3.rds')
+red_bluff4 <- read_rds('data-raw/mill_creek/red_bluff4.rds')
 
 red_bluff3$data %>%
   bind_rows(red_bluff4$data) %>%
