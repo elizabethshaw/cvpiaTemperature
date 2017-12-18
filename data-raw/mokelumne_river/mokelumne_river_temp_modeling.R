@@ -80,12 +80,23 @@ frandy_mean_temps %>% summarise(min(date), max(date))
 lodi2 <- read_rds('data-raw/mokelumne_river/lodi2.rds')
 lodi3 <- read_rds('data-raw/mokelumne_river/lodi3.rds')
 
-lodi2$data %>%
+moke_at <- lodi2$data %>%
   bind_rows(lodi3$data) %>%
   select(date, mean_air_temp_c = value) %>%
-  mutate(date = as_date(ymd_hms(date))) %>%
+  mutate(date = as_date(ymd_hms(date)))
+
+moke_at %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
+
+frandy_mean_temps %>%
+  left_join(moke_at) %>%
+  ggplot(aes(x = mean_air_temp_c, y = mean_water_temp_c)) +
+  geom_point(aes(color = as.character(month(date)))) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  geom_hline(yintercept = 20, alpha = .2) +
+  geom_hline(yintercept = 18, alpha = .2)
+
 
 # lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
 #                      startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
