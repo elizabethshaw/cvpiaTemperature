@@ -42,10 +42,17 @@ yuba_air_temp %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
 
-yuba3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-                     startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
-yuba4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-                     startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+
+# yuba3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+#                      startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+# yuba4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+#                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+#
+# write_rds(yuba3, 'data-raw/yuba_river/yuba3.rds')
+# write_rds(yuba4, 'data-raw/yuba_river/yuba4.rds')
+
+yuba3 <- read_rds('data-raw/yuba_river/yuba3.rds')
+yuba4 <- read_rds('data-raw/yuba_river/yuba4.rds')
 
 yuba3$data %>%
   bind_rows(yuba4$data) %>%
