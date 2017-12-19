@@ -8,11 +8,6 @@ deer_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11383500', parameter
                                            startDate = '1998-10-05', endDate = '2017-11-10',
                                            statCd = c('00001', '00002', '00008'))
 
-# air temp from corning, ca from noaa cdo
-deer_air_temp <- read_csv('data-raw/deer_creek/corning_ca_air_temp.csv')
-
-glimpse(deer_air_temp)
-
 # lots of missing median values from gage, use mean of min and max water temp to approximate median water temp
 glimpse(deer_water_temp)
 deer_water_temp %>%
@@ -32,36 +27,163 @@ dt <- deer_water_temp %>%
   select(date = Date, temp_c_max = X_00010_00001,
          temp_c_min = X_00010_00002) %>%
   mutate(water_temp_c = (temp_c_min + temp_c_max)/2) %>%
-  select(date, water_temp_c)
+  select(date, water_temp_c) %>%
+  group_by(year = year(date), month = month(date)) %>%
+  summarise(mean_water_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
+  select(date, mean_water_temp_c)
 
-da <- deer_air_temp_max %>%
-  mutate(air_temp_c = (TAVG - 32) * 5 / 9) %>%
-  select(date = DATE, air_temp_c)
+# find appropriate air temp
+# chico <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                      startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
+# corning <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCRN', datatypeid = 'TAVG',
+#                       startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
+#
+# c1 <- chico$data %>%
+#   mutate(date = as_date(ymd_hms(date))) %>%
+#   select(date, chico = value)
+#
+# c2 <- corning$data %>%
+#   mutate(date = as_date(ymd_hms(date))) %>%
+#   select(date, corning = value)
+#
+# c3 <- c1 %>%
+#   left_join(c2)
+# cor(c3$chico, c3$corning, use = 'complete.obs')
+# corning is close to where we need, but incomplete date coverage, chico is good
+# chico1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                       startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+# chico2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                       startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+#
+# write_rds(chico1, 'data-raw/deer_creek/chico1.rds')
+# write_rds(chico2, 'data-raw/deer_creek/chico2.rds')
+chico1 <- read_rds('data-raw/deer_creek/chico1.rds')
+chico2 <- read_rds('data-raw/deer_creek/chico2.rds')
 
-deer_creek <- da %>%
-  left_join(dt) %>%
-  group_by(month = month(date), year = year(date)) %>%
-  summarise(mean_air_temp_c = mean(air_temp_c, na.rm = TRUE),
-            mean_water_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
-  filter(!is.na(mean_water_temp_c))
+chico1$data %>%
+  bind_rows(chico2$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col()
 
-glimpse(deer_creek)
+chico_at <- chico1$data %>%
+  bind_rows(chico2$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  bind_rows(
+    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+           mean_air_temp_c = 0)
+  ) %>%
+  group_by(date) %>%
+  summarise(mean_air_temp_c = max(mean_air_temp_c)) %>%
+  ungroup() %>%
+  mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
-deer_creek %>%
-  ggplot(aes(x = mean_air_temp_c, y = mean_water_temp_c)) +
-  geom_point() +
-  geom_smooth(method = 'lm', se = FALSE)
+ts_chico_at <- ts(chico_at$mean_air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
 
-deer_water_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = deer_creek)
+na.interp(ts_chico_at) %>% autoplot(series = 'Interpolated') +
+  forecast::autolayer(ts_chico_at, series = 'Original')
+
+deer_air_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  mean_air_temp_c = as.numeric(na.interp(ts_chico_at)))
+
+
+deer_air_temp_c %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col(fill = 'darkgoldenrod2') +
+  geom_col(data = chico_at, aes(x = date, y = mean_air_temp_c)) +
+  theme_minimal() +
+  labs(y = 'monthly mean air temperature (°C)')
+
+# get data for training model
+# chico3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                       startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
+# chico4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                       startdate = '2008-01-01', enddate = '2017-11-30', token = token, limit = 130)
+#
+# # too much missing data, look at other chico station
+# chico3$data %>%
+#   bind_rows(chico4$data) %>%
+#   mutate(date = as_date(ymd_hms(date))) %>%
+#   select(date, mean_air_temp_c = value) %>%
+#   ggplot(aes(x = date, y = mean_air_temp_c)) +
+#   geom_col()
+#
+# chico5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
+#                       startdate = '1995-01-01', enddate = '1998-12-31', token = token, limit = 130)
+# chico6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+#                       startdate = '1995-01-01', enddate = '1998-12-31', token = token, limit = 130)
+#
+# # substituting other chico station is reasonable
+# chico5$data %>%
+#   bind_rows(chico6$data) %>%
+#   mutate(date = as_date(ymd_hms(date))) %>%
+#   select(date, mean_air_temp_c = value, station) %>%
+#   ggplot(aes(x = date, y = mean_air_temp_c, fill = station)) +
+#   geom_col(position = 'dodge') +
+#   geom_hline(yintercept = 18) +
+#   geom_hline(yintercept = 20)
+#
+# chico7 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
+#                       startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
+# chico8 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
+#                       startdate = '2008-01-01', enddate = '2017-11-30', token = token, limit = 130)
+# write_rds(chico7, 'data-raw/deer_creek/chico7.rds')
+# write_rds(chico8, 'data-raw/deer_creek/chico8.rds')
+chico3 <- read_rds('data-raw/deer_creek/chico7.rds')
+chico4 <- read_rds('data-raw/deer_creek/chico8.rds')
+
+chico3$data %>%
+  bind_rows(chico4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col()
+
+chico_train_at <- chico3$data %>%
+  bind_rows(chico4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  bind_rows(
+    tibble(date = seq.Date(ymd('1998-01-01'), ymd('2014-03-01'), by = 'month'),
+           mean_air_temp_c = 0)
+  ) %>%
+  group_by(date) %>%
+  summarise(mean_air_temp_c = max(mean_air_temp_c)) %>%
+  ungroup() %>%
+  mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
+
+ts_chico_tat <- ts(chico_train_at$mean_air_temp_c, start = c(1998, 1), end = c(2014, 3), frequency = 12)
+
+na.interp(ts_chico_tat) %>% autoplot(series = 'Interpolated') +
+  forecast::autolayer(ts_chico_tat, series = 'Original')
+
+deer_air_temp <- tibble(
+  date = seq.Date(ymd('1998-01-01'), ymd('2014-03-01'), by = 'month'),
+  mean_air_temp_c = as.numeric(na.interp(ts_chico_tat)))
+
+deer <- dt %>%
+  left_join(deer_air_temp) %>%
+  filter(!is.na(mean_air_temp_c))
+
+deer_water_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = deer)
 summary(deer_water_temp_model)
 
-bad_water_temps <- c(18, 20)
-b0 <- deer_water_temp_model$coefficients[[1]]
-b1 <- deer_water_temp_model$coefficients[[2]]
+deer_predicted_water_temp <- predict(deer_water_temp_model, deer_air_temp_c)
 
-air_temp_thersholds <- (bad_water_temps - b0) / b1
+deer_water_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  `Deer Creek` = deer_predicted_water_temp)
 
-# no temp during 1980-1999 near by
-# GHCND:USC00041715 closest or paradise again?
-# TODO ask mark
-# GHCND:USW00024216
+deer_water_temp_c %>%
+  ggplot(aes(x = date)) +
+  geom_line(aes(y = `Deer Creek`)) +
+  geom_hline(yintercept = 18) +
+  geom_hline(yintercept = 20) +
+  theme_minimal()
+
+write_rds(deer_water_temp_c, 'data-raw/deer_creek/deer_creek_water_temp_c.rds')

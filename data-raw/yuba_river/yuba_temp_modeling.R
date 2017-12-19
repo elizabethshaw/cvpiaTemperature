@@ -142,8 +142,8 @@ yuba_water_temp_c %>%
   geom_hline(yintercept = 18) +
   geom_hline(yintercept = 20) +
   theme_minimal()
+# TODO ask mark, use measured with modeled?
 
 
-write_rds(yuba_water_temp_c, 'data-raw/yuba_river/yuba_river_water_temp_c.rds')
-
+# write_rds(yuba_water_temp_c, 'data-raw/yuba_river/yuba_river_water_temp_c.rds')
 
