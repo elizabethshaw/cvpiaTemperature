@@ -3,7 +3,7 @@ library(readxl)
 library(lubridate)
 library(stringr)
 
-# mike wrights notes on temperature
+# mike wright's notes on temperature
 
 # Here 5q_date is the 6-hourly time stamps on the 5Q output; note that it's on
 # the CalLite-CV calendar i.e. starting in 2014 (except that the SJR run starts
