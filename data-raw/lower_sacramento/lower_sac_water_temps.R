@@ -29,9 +29,7 @@ freeport_water_temp %>%
   ggplot(aes(x = date, y = meanish)) +
   geom_col()
 
-# imputation test few dif methods
-install.packages('imputeTS')
-library(imputeTS)
+# imputation
 library(forecast)
 ?na.interp
 
@@ -61,13 +59,14 @@ na.interp(ts_freeport) %>% autoplot(series = 'Interpolated') +
 
 lower_sac_water_temp_c <- tibble(
   date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
-  mean_water_temp_c = as.numeric(na.interp(ts_freeport)))
+  `Lower Sacramento River` = as.numeric(na.interp(ts_freeport)))
 
 
 lower_sac_water_temp_c %>%
-  ggplot(aes(x = date, y = mean_water_temp_c)) +
+  ggplot(aes(x = date, y = `Lower Sacramento River`)) +
   geom_col(fill = 'darkgoldenrod2') +
   geom_col(data = free, aes(x = date, y = mean_water_temp_c)) +
-  theme_minimal()
+  theme_minimal() +
+  labs(y = 'monthly mean water temperature (°C)')
 
 write_rds(lower_sac_water_temp_c, 'data-raw/lower_sacramento/lower_sac_water_temp_c.rds')

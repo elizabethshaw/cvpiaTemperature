@@ -2,6 +2,7 @@ library(tidyverse)
 library(lubridate)
 library(rnoaa)
 library(dataRetrieval)
+library(forecast)
 
 mill_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11381500', parameterCd = '00010',
                                              startDate = '1998-10-05', endDate = '2017-12-15',
@@ -87,5 +88,49 @@ red_bluff3$data %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
-#data gaps
-# monte carlo timeseries to fill in missing data
+
+
+?na.interp
+
+red_bluff <- red_bluff3$data %>%
+  bind_rows(red_bluff4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, mean_air_temp_c = value) %>%
+  bind_rows(
+    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+           mean_air_temp_c = 0)
+  ) %>%
+  group_by(date) %>%
+  summarise(mean_air_temp_c = max(mean_air_temp_c)) %>%
+  ungroup() %>%
+  mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
+
+
+ts_red_bluff <- ts(red_bluff$mean_air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+
+na.interp(ts_red_bluff) %>% autoplot(series = 'Interpolated') +
+  forecast::autolayer(ts_red_bluff, series = 'Original')
+
+mill_air_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  mean_air_temp_c = as.numeric(na.interp(ts_red_bluff)))
+
+
+mill_air_temp_c %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col(fill = 'darkgoldenrod2') +
+  geom_col(data = red_bluff, aes(x = date, y = mean_air_temp_c)) +
+  theme_minimal() +
+  labs(y = 'monthly mean air temperature (°C)')
+
+mill_pred_water_temp <- predict(mill_temp_model, mill_air_temp_c)
+
+mill_water_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  `Mill Creek` = mill_pred_water_temp)
+
+mill_water_temp_c %>%
+  ggplot(aes(x = date, y = `Mill Creek`)) +
+  geom_col()
+
+write_rds(mill_water_temp_c, 'data-raw/mill_creek/mill_creek_water_temp_c.rds')
