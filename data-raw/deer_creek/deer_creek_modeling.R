@@ -5,7 +5,8 @@ library(rnoaa)
 
 # usgs water temp
 deer_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11383500', parameterCd = '00010',
-                                           startDate = '1998-10-05', endDate = '2017-11-10', statCd = c('00001', '00002', '00008'))
+                                           startDate = '1998-10-05', endDate = '2017-11-10',
+                                           statCd = c('00001', '00002', '00008'))
 
 # air temp from corning, ca from noaa cdo
 deer_air_temp <- read_csv('data-raw/deer_creek/corning_ca_air_temp.csv')
@@ -63,3 +64,4 @@ air_temp_thersholds <- (bad_water_temps - b0) / b1
 # no temp during 1980-1999 near by
 # GHCND:USC00041715 closest or paradise again?
 # TODO ask mark
+# GHCND:USW00024216

@@ -3,6 +3,7 @@ library(lubridate)
 library(rnoaa)
 library(dataRetrieval)
 
+
 # cosumnes river at michigan bar ca 1965-10-01  	2016-03-03
 cosum_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11335000', parameterCd = '00010',
                                                  startDate = '1980-01-01', endDate = '1999-12-31',
@@ -52,8 +53,6 @@ cosum_wt <- cosum_water_temp %>%
 
 cosum_wt %>% summarise(min(date), max(date))
 # GHCND:USW00023232
-# GHCND:USW00023271
-# GHCND:USC00047370
+# GHCND:USW00023271 probs better
 # GHCND:USC00043038 best?
-# GHCND:USC00048713
 # https://www.ncdc.noaa.gov/cdo-web/results

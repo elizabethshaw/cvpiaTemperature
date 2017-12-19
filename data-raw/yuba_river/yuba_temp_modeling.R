@@ -61,3 +61,4 @@ yuba3$data %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
 #data gaps
+

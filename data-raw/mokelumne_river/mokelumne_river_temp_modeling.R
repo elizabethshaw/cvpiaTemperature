@@ -115,3 +115,5 @@ lodi4$data %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
+
+#imputation
