@@ -90,69 +90,45 @@ paradise3$data %>%
   labs(y = 'monthly average air temperature (°C)') +
   theme_minimal()
 
-# data for setting modeled values
-butte_air <- paradise3$data %>%
+paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
-  select(date, mean_air_temp_c = value)
-
-predicted_water_temp_c <- predict(butte_model, butte_air)
-
-butte_air$predicted_water_temp_c <- predicted_water_temp_c
-
-years_with_missing_months <- butte_air %>%
-  group_by(year = year(date)) %>%
-  summarise(missing_months = 12 - n()) %>%
-  filter(missing_months > 0) %>%
-  pull(year)
-
-fake_dates <- tibble(year = rep(years_with_missing_months, each = 12),
-                     month = rep(1:12, times = length(years_with_missing_months)))
-
-missing_air_temp_data <- butte_air %>%
-  filter(year(date) %in% years_with_missing_months) %>%
-  mutate(year = year(date), month = month(date)) %>%
-  select(year, month) %>%
-  bind_rows(fake_dates) %>%
-  group_by(year, month) %>%
-  summarise(count = n()) %>%
-  filter(count < 2) %>%
+  select(date, mean_air_temp_c = value) %>%
+  bind_rows(
+    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+           mean_air_temp_c = 0)
+  ) %>%
+  group_by(date) %>%
+  summarise(mean_air_temp_c = max(mean_air_temp_c)) %>%
   ungroup() %>%
-  mutate(date = ymd(paste(year, month, '01', sep = '-')),
-         mean_air_temp_c = NA,
-         predicted_water_temp_c = NA) %>%
-  select(date, mean_air_temp_c, predicted_water_temp_c)
+  mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
-modeled_butte_water_temp_c <- butte_air %>%
-  bind_rows(missing_air_temp_data) %>%
-  arrange(date)
 
-modeled_butte_water_temp_c %>%
-  ggplot(aes(x = date, y = predicted_water_temp_c)) +
-  geom_col() +
-  geom_hline(yintercept = 18, alpha = .3) +
-  geom_hline(yintercept = 20, alpha = .3)
+ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
 
-View(modeled_butte_water_temp_c)
-# imputation by eye: if sandwiched by exceedance, exceed
-miss <- modeled_butte_water_temp_c %>%
-  filter(is.na(predicted_water_temp_c)) %>%
-  mutate(predicted_water_temp_c = c(9, 21, 19, 9, 7, 19, 21))
+na.interp(ts_paradise) %>% autoplot(series = 'Interpolated') +
+  forecast::autolayer(ts_paradise, series = 'Original')
 
-mod_butte_water_temp_c <- modeled_butte_water_temp_c %>%
-  filter(!is.na(predicted_water_temp_c)) %>%
-  bind_rows(miss) %>%
-  arrange(date)
+butte_air_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  mean_air_temp_c = as.numeric(na.interp(ts_paradise)))
 
-mod_butte_water_temp_c %>%
-  mutate(exceed = case_when(
-    predicted_water_temp_c > 20 ~ 'over 20',
-    predicted_water_temp_c > 18 ~ 'over 18',
-    TRUE ~ 'none'
-  )) %>%
-  ggplot(aes(x = date, y = predicted_water_temp_c, fill = exceed)) +
-  geom_col() +
-  geom_hline(yintercept = 18, alpha = .3) +
-  geom_hline(yintercept = 20, alpha = .3) +
-  scale_fill_manual(values = c('#969696', '#feb24c', '#bd0026')) +
-  theme_minimal()
+
+paradise_air_temp %>%
+  ggplot(aes(x = date, y = mean_air_temp_c)) +
+  geom_col(fill = 'darkgoldenrod2') +
+  geom_col(data = butte_air_temp_c, aes(x = date, y = mean_air_temp_c)) +
+  theme_minimal() +
+  labs(y = 'monthly mean air temperature (°C)')
+
+butte_pred_water_temp <- predict(butte_model, butte_air_temp_c)
+
+butte_water_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  `Butte Creek` = butte_pred_water_temp)
+
+butte_water_temp_c %>%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = `Butte Creek`))
+
+write_rds(butte_water_temp_c, 'data-raw/butte_creek/butte_creek_water_temp_c.rds')

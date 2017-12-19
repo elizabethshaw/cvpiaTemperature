@@ -89,9 +89,6 @@ red_bluff3$data %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
 
-
-?na.interp
-
 red_bluff <- red_bluff3$data %>%
   bind_rows(red_bluff4$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
