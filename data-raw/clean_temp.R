@@ -29,8 +29,6 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
-big_chico <- select(read_rds('data-raw/big_chico_creek/big_chico_creek_water_temp_c.rds'), `Big Chico Creek`)
-
 monthly_mean_temperature <- temperatures %>%
   group_by(year = year(date), month = month(date), watershed) %>%
   summarise(monthly_mean_temp_c = mean(mean_daily_temp_C)) %>%
