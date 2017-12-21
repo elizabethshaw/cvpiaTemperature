@@ -2,7 +2,7 @@ library(rnoaa)
 library(tidyverse)
 library(dataRetrieval)
 library(lubridate)
-library(caret)
+library(broom)
 
 token <- Sys.getenv("token")
 
@@ -57,16 +57,22 @@ air_temp_thersholds <- (bad_water_temps - b0) / b1
 
 
 # temperature data from Mike Urkov---------------------
-frandy <- read_csv('data-raw/mokelumne_river/Frandy15min.csv')
-frandy_mean_temps <- frandy %>%
-  mutate(date = as.Date(date, '%H:%M:%S %m/%d/%Y')) %>%
+victor <- read_csv('data-raw/mokelumne_river/Victor15min.csv')
+
+victor_mean_temps <- victor %>%
+  mutate(date = as.Date(Time, '%H:%M:%S %m/%d/%Y')) %>%
   group_by(year = year(date), month = month(date)) %>%
-  summarise(mean_water_temp_c = mean(water_tempC, na.rm = TRUE)) %>%
+  summarise(mean_water_temp_c = mean(WaterTemperatureCelsius, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
   select(date, mean_water_temp_c)
 
-frandy_mean_temps %>% summarise(min(date), max(date))
+victor_mean_temps %>% summarise(min(date), max(date))
+
+victor_mean_temps %>%
+  mutate(month = factor(x = month(date), labels = month.name, ordered = TRUE)) %>%
+  ggplot(aes(x = date, y = mean_water_temp_c, fill = month)) +
+  geom_col()
 
 
 #Lodi
@@ -89,13 +95,20 @@ moke_at %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
   geom_col()
 
-frandy_mean_temps %>%
+moke <- victor_mean_temps %>%
   left_join(moke_at) %>%
-  ggplot(aes(x = mean_air_temp_c, y = mean_water_temp_c)) +
-  geom_point(aes(color = as.character(month(date)))) +
-  geom_smooth(method = 'lm', se = FALSE) +
-  geom_hline(yintercept = 20, alpha = .2) +
-  geom_hline(yintercept = 18, alpha = .2)
+  filter(!is.na(mean_water_temp_c), !is.na(mean_air_temp_c)) %>%
+  mutate(early = ifelse(month(date) > 8, TRUE, FALSE))
+
+moke_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c + early, data = moke)
+summary(moke_temp_model)
+augment(moke_temp_model) %>% glimpse()
+
+moke %>%
+  mutate(month = factor(x = month(date), labels = month.name, ordered = TRUE)) %>%
+  ggplot() +
+  geom_point(aes(mean_air_temp_c, mean_water_temp_c, color = month, group = early)) +
+  geom_line(data = augment(moke_temp_model), aes(x = mean_air_temp_c, y = .fitted, group = early))
 
 
 # lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
@@ -138,7 +151,8 @@ na.interp(ts_lodi) %>% autoplot(series = 'Interpolated') +
 
 moke_air_temp_c <- tibble(
   date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
-  mean_air_temp_c = as.numeric(na.interp(ts_lodi)))
+  mean_air_temp_c = as.numeric(na.interp(ts_lodi))) %>%
+  mutate(early = ifelse(month(date) > 8, TRUE, FALSE))
 
 moke_air_temp_c %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
@@ -147,4 +161,16 @@ moke_air_temp_c %>%
   theme_minimal() +
   labs(y = 'monthly mean air temperature (°C)')
 
-# TODO get water temps at other lokations from mike u
+moke_predicted_water_temp <- predict(moke_temp_model, moke_air_temp_c)
+
+moke_water_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  `Mokelumne River` = moke_predicted_water_temp)
+
+moke_water_temp_c %>%
+  ggplot(aes(x = date, y = `Mokelumne River`)) +
+  geom_col(alpha = .2) +
+  geom_col(data = victor_mean_temps, aes(y = mean_water_temp_c), alpha = .4) +
+  geom_hline(yintercept = 18)
+
+write_rds(moke_water_temp_c, 'data-raw/mokelumne_river/mokelumne_river_water_temp_c.rds')

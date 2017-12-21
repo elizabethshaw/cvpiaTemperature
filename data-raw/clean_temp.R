@@ -29,60 +29,37 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
-temperatures
+big_chico <- select(read_rds('data-raw/big_chico_creek/big_chico_creek_water_temp_c.rds'), `Big Chico Creek`)
 
-
-# need to create temperatures for these watersheds
-cvpia_watershed[!(cvpia_watershed %in% unique(temps$watershed))]
-
-place_holders <- data.frame(matrix(ncol = 17, nrow = 31017))
-colnames(place_holders) <- cvpia_watershed[!(cvpia_watershed %in% unique(temps$watershed))]
-
-all_temperatures <- temps %>%
-  select(date, watershed, mean_daily_temp_C) %>%
-  spread(watershed, mean_daily_temp_C) %>%
-  bind_cols(place_holders) %>%
-  select(date, cvpia_watershed)
-
-View(all_temperatures)
-
-place_holders_monthly <- place_holders[1:1019, ]
-
-monthly_temps <-read_csv('data-raw/tempmaster.csv', skip = 1) %>%
-  mutate(day_month = str_sub(`5q_date`, 1, 6),
-         year = str_sub(`5q_date`, 8, 9),
-         year = str_c('20', year),
-         date = dmy(paste(day_month, year))) %>%
-  select(-day_month, -year, -`5q_date`) %>%
-  gather(watershed, temp_F, -date) %>%
-  mutate(year = year(date), month = month(date)) %>%
-  group_by(year, month, watershed) %>%
-  summarise(mean_monthly_temp_F = mean(temp_F, na.rm = TRUE),
-            mean_monthly_temp_C = (mean_monthly_temp_F - 32) * (5/9)) %>%
+monthly_mean_temperature <- temperatures %>%
+  group_by(year = year(date), month = month(date), watershed) %>%
+  summarise(monthly_mean_temp_c = mean(mean_daily_temp_C)) %>%
   ungroup() %>%
-  mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
-  select(date, watershed, mean_monthly_temp_C) %>%
-  spread(watershed, mean_monthly_temp_C) %>%
-  bind_cols(place_holders_monthly) %>%
+  mutate(cl_date = ymd(paste(year, month, 1, sep = '-'))) %>%
+  left_join(cl_dates) %>%
+  filter(between(year(cs_date), 1980, 1999)) %>%
+  select(date = cs_date, watershed, monthly_mean_temp_c) %>%
+  spread(watershed, monthly_mean_temp_c) %>%
+  bind_cols(select(read_rds('data-raw/big_chico_creek/big_chico_creek_water_temp_c.rds'), `Big Chico Creek`)) %>%
+  bind_cols(select(read_rds('data-raw/butte_creek/butte_creek_water_temp_c.rds'), `Butte Creek`)) %>%
+  bind_cols(select(read_rds('data-raw/cosumnes_river/cosumnes_water_temp_c.rds'), `Cosumnes River`)) %>%
+  bind_cols(select(read_rds('data-raw/deer_creek/deer_creek_water_temp_c.rds'), `Deer Creek`)) %>%
+  bind_cols(select(read_rds('data-raw/lower_sacramento/lower_sac_water_temp_c.rds'), `Lower Sacramento River`)) %>%
+  bind_cols(select(read_rds('data-raw/mill_creek/mill_creek_water_temp_c.rds'), `Mill Creek`)) %>%
+  bind_cols(select(read_rds('data-raw/mokelumne_river/mokelumne_river_water_temp_c.rds'), `Mokelumne River`)) %>%
+  bind_cols(select(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds'), `Yuba River`)) %>%
+  mutate(`Antelope Creek` = `Cow Creek`,
+         `Bear Creek` = `Cow Creek`,
+         `Elder Creek` = `Thomes Creek`,
+         `Paynes Creek` = `Cow Creek`,
+         `Bear River` = NA,
+         `Feather River` = `American River`,
+         `Calaveras River` = `Mokelumne River`,
+         `Yolo Bypass` = NA,
+         `Sutter Bypass` = NA) %>%
   select(date, cvpia_watershed)
 
-#for mike U to pick temperature standins
-monthly_temps %>%
-  gather(watershed, temp, - date) %>%
-  filter(date == '2014-11-01') %>%
-  left_join(read_csv('data-raw/cvpia_trib_names.csv')) %>%
-  mutate(temp_modeled = !is.na(temp), temp_standin = ifelse(temp_modeled, NA, '')) %>%
-  arrange(order) %>%
-  select(order, watershed, temp_modeled, temp_standin) %>%
-  write_csv('cvpia_temp_modeled.csv')
-
-View(monthly_temps)
-monthly_temps %>%
-  left_join(cl_dates, by = c('date' = 'cl_date')) %>%
-  select(cl_date = date, cs_date, cvpia_watershed) %>%
-  write_csv('cvpia_monthly_mean_temperatures.csv')
-
-range(monthly_temps$date)
+View(monthly_mean_temperature)
 
 #degday
 #sum daily mean tmep over oct and nov
