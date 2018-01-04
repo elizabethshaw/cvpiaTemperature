@@ -2,6 +2,7 @@ library(tidyverse)
 library(readxl)
 library(lubridate)
 library(stringr)
+library(ggsci)
 
 # mike wright's notes on temperature
 
@@ -14,6 +15,7 @@ library(stringr)
 # IN FAHRENHEIT!
 
 cl_dates <- read_csv('data-raw/calLite_calSim_date_mapping.csv')
+cvpia_watershed_ids <- read_csv('data-raw/cvpia_trib_names.csv')
 cvpia_watershed <- read_csv('data-raw/cvpia_trib_names.csv') %>%
   pull(watershed)
 
@@ -60,24 +62,75 @@ monthly_mean_temperature <- temperatures %>%
 View(monthly_mean_temperature)
 
 #degday
-#sum daily mean tmep over oct and nov
+#sum daily mean temp over oct and nov
 #sum * 14/60 upper sac river
 #sum * 7/60 everything else
-# temperature %>%
-#   dplyr::select(-`5Q date`, -`N.Delta`, -`SC.Delta`) %>%
-#   tidyr::gather(watershed, temperature, -`DSM date`) %>%
-#   dplyr::mutate(date = as.Date(`DSM date`)) %>%
-#   dplyr::filter(lubridate::month(date) %in% c(10, 11)) %>%
-#   dplyr::group_by(date, watershed) %>%
-#   dplyr::summarise(avg_temp = mean(temperature, na.rm = TRUE)) %>%
-#   dplyr::mutate(year = lubridate::year(date)) %>%
-#   dplyr::group_by(year, watershed) %>%
-#   dplyr::summarise(sum = sum(avg_temp)) %>%
-#   dplyr::mutate(degday = ifelse(watershed == 'Upper Sacramento River', sum * 14/60, sum * 7/60)) %>%
-#   dplyr::left_join(watershed_ordering) %>%
-#   dplyr::arrange(year, order) %>%   dplyr::ungroup() %>% View()
-# #zeros 16,17, 21, 22, 24, 31
+cl_years <- cl_dates %>%
+  mutate(cl_year = year(cl_date),
+         cs_year = year(cs_date)) %>%
+  select(cl_year, cs_year) %>%
+  unique()
 
+# watershed id zeros: 16*, 17, 21, 22, 24, 31 (no spawning)
+# *upper mid sac (16) spawning area is represented within upper sac in model
+zero_watersheds <- cvpia_watershed_ids %>%
+  filter(order %in% c(16, 17, 21, 22, 24, 31)) %>%
+  pull(watershed)
+
+zero_degday <- tibble(
+  year = rep(rep(1980:1999, each = 3), times = 6),
+  watershed = rep(zero_watersheds, each = 20 * 3),
+  species = rep(c('fall_run', 'spring_run', 'winter_run'), times = 20 * 6)) %>%
+  mutate(degdays = 0)
+
+heq5q_degday <- temperatures %>%
+  mutate(month = month(date),
+    species = case_when(
+    month %in% c(10, 11) ~ 'fall_run',
+    month %in% c(7, 8) ~ 'spring_run',
+    month %in% c(3, 4) ~ 'winter_run')) %>%
+  filter(!is.na(species), !(watershed %in% zero_watersheds)) %>% #no spawning
+  group_by(cl_year = year(date), watershed, species) %>%
+  summarise(degdays = sum(mean_daily_temp_C, na.rm = TRUE)) %>%
+  ungroup() %>%
+  left_join(cl_years) %>%
+  filter(between(cs_year, 1980, 1999)) %>%
+  select(year = cs_year, watershed, species, degdays)
+
+# take modeled mean monthly flow and multiple by number of days to estimate degree days
+estimate_watersheds <- cvpia_watershed[!cvpia_watershed %in% c(unique(heq5q_degday$watershed), unique(zero_degday$watershed))]
+
+estimate_degday <- monthly_mean_temperature %>%
+  gather(watershed, temp, - date) %>%
+  mutate(month = month(date),
+         species = case_when(
+           month %in% c(10, 11) ~ 'fall_run',
+           month %in% c(7, 8) ~ 'spring_run',
+           month %in% c(3, 4) ~ 'winter_run'),
+         num_days = days_in_month(month),
+         month_degday = temp * num_days) %>%
+  filter(!is.na(species), watershed %in% estimate_watersheds) %>%
+  group_by(watershed, species, year = year(date)) %>%
+  summarise(degdays = sum(month_degday)) %>%
+  ungroup() %>%
+  select(year, watershed, species, degdays)
+
+deg_days <- zero_degday %>%
+  bind_rows(heq5q_degday) %>%
+  bind_rows(estimate_degday) %>%
+  left_join(cvpia_watershed_ids) %>%
+  arrange(species, order, year)
+
+deg_days %>%
+  filter(degdays != 0) %>%
+  ggplot(aes(x = year, y = degdays, color = watershed)) +
+  geom_line() +
+  theme_minimal() +
+  scale_y_continuous(limits = c(0, 1200)) +
+  facet_wrap(~species)
+
+# TODO need to confirm method for degree days
+# confirm time frames for other species, and exclude appropriate watersheds
 
 # delta temps ----------------------------------
 # North Delta use USGS 11455420 SACRAMENTO R A RIO VISTA CA
