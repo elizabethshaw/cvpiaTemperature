@@ -71,6 +71,11 @@ ee <- emmaton %>%
   filter(mean_temp_f < 100) %>% #remove errors
   mutate(location = 'emmaton')
 
+annotate_years <- function(year) {
+  annotate("rect", xmin = ymd(paste0(year,'-06-01')), xmax = ymd(paste0(year, '-10-01')),
+           ymin = -Inf, ymax = Inf, alpha = 0.2)
+}
+
 filter(mr, year(date) >= 2010) %>%
   bind_rows(filter(or, year(date) >= 2010)) %>%
   bind_rows(filter(pp, year(date) >= 2010)) %>%
@@ -78,24 +83,8 @@ filter(mr, year(date) >= 2010) %>%
   mutate(mean_temp_c = (mean_temp_f - 32) * 5/9) %>%
   ggplot() +
   geom_line(aes(x = date, y = mean_temp_c, color = location)) +
-  # scale_y_continuous(limits = c(0, 30)) +
   theme_minimal() +
-  annotate("rect", xmin = ymd('2010-06-01'), xmax = ymd('2010-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2011-06-01'), xmax = ymd('2011-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2012-06-01'), xmax = ymd('2012-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2013-06-01'), xmax = ymd('2013-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2014-06-01'), xmax = ymd('2014-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2015-06-01'), xmax = ymd('2015-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2016-06-01'), xmax = ymd('2016-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
-  annotate("rect", xmin = ymd('2017-06-01'), xmax = ymd('2017-10-01'),
-           ymin = -Inf, ymax = Inf, alpha = 0.2) +
+  annotate_years(2010:2017) +
   geom_hline(yintercept = 20, linetype = 2) +
   geom_hline(yintercept = 18, linetype = 2)
 
