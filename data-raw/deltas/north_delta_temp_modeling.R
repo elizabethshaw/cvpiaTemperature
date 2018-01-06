@@ -2,6 +2,7 @@ library(tidyverse)
 library(lubridate)
 library(CDECRetrieve)
 library(rnoaa)
+library(forecast)
 
 emmaton <- cdec_query(stations = 'EMM', sensor_num = '25', dur_code = 'H',
                       start_date = '1999-02-23', end_date = '2017-12-31')
@@ -29,5 +30,79 @@ ggplot(north_delta, aes(x = date, y = mean_temp_c)) +
   theme_minimal()
 
 # air temp
-travis <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023202', datatypeid = 'TAVG',
+antioch1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+                       startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+antioch2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+
+antioch1$data %>%
+  bind_rows(antioch2$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  ggplot(aes(x = date, y = value)) +
+  geom_col()
+
+antioch3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+                        startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
+antioch4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+                        startdate = '2009-01-01', enddate = '2017-12-31', token = token, limit = 130)
+
+antioch3$data %>%
+  bind_rows(antioch4$data) %>%
+  mutate(date = ymd_hms(date)) %>%
+  ggplot(aes(x = date, y = value)) +
+  geom_col()
+
+air_temp_training <- antioch3$data %>%
+  bind_rows(antioch4$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, air_temp_c = value)
+
+water_temp_training <- north_delta %>%
+  group_by(year = year(date), month = month(date)) %>%
+  summarise(water_temp_c = mean(mean_temp_c, na.rm = TRUE)) %>%
+  mutate(date = ymd(paste(year, month, 1, sep = '-'))) %>%
+  ungroup() %>%
+  select(date, water_temp_c)
+
+water_temp_training %>%
+  left_join(air_temp_training) %>%
+  filter(!is.na(air_temp_c)) %>%
+  ggplot(aes(x = air_temp_c, y = water_temp_c)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE)
+
+north_delta_training <- water_temp_training %>%
+  left_join(air_temp_training) %>%
+  filter(!is.na(air_temp_c))
+
+north_delta_temp_model <- lm(water_temp_c ~ air_temp_c, north_delta_training)
+summary(north_delta_temp_model)
+
+north_delta_air_temp <- antioch1$data %>%
+  bind_rows(antioch2$data) %>%
+  mutate(date = as_date(ymd_hms(date))) %>%
+  select(date, air_temp_c = value)
+
+ts_north_delta_at <- ts(north_delta_air_temp$air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+
+na.interp(ts_north_delta_at) %>% autoplot(series = 'Interpolated') +
+  forecast::autolayer(ts_north_delta_at, series = 'Original')
+
+north_delta_air_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  air_temp_c = as.numeric(na.interp(ts_north_delta_at)))
+
+north_delta_air_pred <- predict(north_delta_temp_model, north_delta_air_temp_c)
+
+north_delta_water_temp_c <- tibble(
+  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  `North Delta` = north_delta_air_pred)
+
+north_delta_water_temp_c %>%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = `North Delta`)) +
+  geom_hline(yintercept = 18) +
+  geom_hline(yintercept = 20) +
+  theme_minimal()
+
+write_rds(north_delta_water_temp_c, 'data-raw/deltas/north_delta_water_temp_c.rds')
