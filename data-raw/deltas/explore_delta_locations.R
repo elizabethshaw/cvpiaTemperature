@@ -72,7 +72,7 @@ ee <- emmaton %>%
   mutate(location = 'emmaton')
 
 annotate_years <- function(year) {
-  annotate("rect", xmin = ymd(paste0(year,'-06-01')), xmax = ymd(paste0(year, '-10-01')),
+  annotate("rect", xmin = ymd(paste0(year,'-06-01')), xmax = ymd(paste0(year, '-09-01')),
            ymin = -Inf, ymax = Inf, alpha = 0.2)
 }
 
@@ -89,4 +89,4 @@ filter(mr, year(date) >= 2010) %>%
   geom_hline(yintercept = 18, linetype = 2)
 
 
-
+# TODO use emmaton for north delta and middle river for south delta temperature modeling
