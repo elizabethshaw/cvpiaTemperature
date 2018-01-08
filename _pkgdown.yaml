@@ -1,0 +1,27 @@
+title: cvpiaTemperature
+url: https://flowwest.github.io/cvpiaTemperature/
+template:
+  params:
+    bootswatch: paper
+
+home:
+  links:
+  - text: Fish and Wildlife Service's CVPIA website
+    href: https://www.fws.gov/lodi/anadromous_fish_restoration/afrp_index.htm
+  - text: Bureau of Reclamation's CVPIA website
+    href: https://www.usbr.gov/mp/cvpia/
+
+reference:
+- title: Temperature Datasets
+  desc: Temperature related data sets used by the CVPIA Salmon Population Model
+  contents:
+  - monthly_mean_temperature
+
+navbar:
+  type: default
+  left:
+  - text: 'Reference'
+    href: reference/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/flowwest/cvpiaTemperature
