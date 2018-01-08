@@ -52,15 +52,10 @@ dt <- deer_water_temp %>%
 #   left_join(c2)
 # cor(c3$chico, c3$corning, use = 'complete.obs')
 # corning is close to where we need, but incomplete date coverage, chico is good
-# chico1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
-#                       startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
-# chico2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
-#                       startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-#
-# write_rds(chico1, 'data-raw/deer_creek/chico1.rds')
-# write_rds(chico2, 'data-raw/deer_creek/chico2.rds')
-chico1 <- read_rds('data-raw/deer_creek/chico1.rds')
-chico2 <- read_rds('data-raw/deer_creek/chico2.rds')
+chico1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+                      startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+chico2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00041715', datatypeid = 'TAVG',
+                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
 
 chico1$data %>%
   bind_rows(chico2$data) %>%
@@ -128,14 +123,10 @@ deer_air_temp_c %>%
 #   geom_hline(yintercept = 18) +
 #   geom_hline(yintercept = 20)
 #
-# chico7 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
-#                       startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
-# chico8 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
-#                       startdate = '2008-01-01', enddate = '2017-11-30', token = token, limit = 130)
-# write_rds(chico7, 'data-raw/deer_creek/chico7.rds')
-# write_rds(chico8, 'data-raw/deer_creek/chico8.rds')
-chico3 <- read_rds('data-raw/deer_creek/chico7.rds')
-chico4 <- read_rds('data-raw/deer_creek/chico8.rds')
+chico3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
+                      startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
+chico4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USR0000CCHC', datatypeid = 'TAVG',
+                      startdate = '2008-01-01', enddate = '2017-11-30', token = token, limit = 130)
 
 chico3$data %>%
   bind_rows(chico4$data) %>%

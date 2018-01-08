@@ -30,8 +30,7 @@ moke_wt %>% summarise(min(date), max(date))
 # temp at lodi
 lodi1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
                      startdate = '1966-01-01', enddate = '1975-12-31', limit = 120, token = token)
-write_rds(lodi1, 'data-raw/mokelumne_river/lodi1.rds')
-lodi1 <- read_rds('data-raw/mokelumne_river/lodi1.rds')
+
 moke_at <- lodi1$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value)
@@ -76,15 +75,12 @@ victor_mean_temps %>%
 
 
 #Lodi
-# lodi2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-#                      startdate = '1994-01-01', enddate = '2003-12-31', limit = 120, token = token)
-#
-# lodi3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-#                      startdate = '2004-01-01', enddate = '2013-12-31', limit = 120, token = token)
-# write_rds(lodi2, 'data-raw/mokelumne_river/lodi2.rds')
-# write_rds(lodi3, 'data-raw/mokelumne_river/lodi3.rds')
-lodi2 <- read_rds('data-raw/mokelumne_river/lodi2.rds')
-lodi3 <- read_rds('data-raw/mokelumne_river/lodi3.rds')
+lodi2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '1994-01-01', enddate = '2003-12-31', limit = 120, token = token)
+
+lodi3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '2004-01-01', enddate = '2013-12-31', limit = 120, token = token)
+
 
 moke_at <- lodi2$data %>%
   bind_rows(lodi3$data) %>%
@@ -111,16 +107,11 @@ moke %>%
   geom_line(data = augment(moke_temp_model), aes(x = mean_air_temp_c, y = .fitted, group = early))
 
 
-# lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-#                      startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
-#
-# lodi5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
-#                      startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
-# write_rds(lodi4, 'data-raw/mokelumne_river/lodi4.rds')
-# write_rds(lodi5, 'data-raw/mokelumne_river/lodi5.rds')
+lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
 
-lodi4 <- read_rds('data-raw/mokelumne_river/lodi4.rds')
-lodi5 <- read_rds('data-raw/mokelumne_river/lodi5.rds')
+lodi5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
 
 lodi4$data %>%
   bind_rows(lodi5$data) %>%

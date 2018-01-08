@@ -4,7 +4,7 @@ library(rnoaa)
 library(dataRetrieval)
 library(forecast)
 
-# yuba river near marysville ca  1964-10-01 	 2003-09-29
+# USGS water temperature yuba river near marysville ca  1964-10-01 	 2003-09-29---------------------
 yuba_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11421000', parameterCd = '00010',
                                               startDate = '1980-01-01', endDate = '1999-12-31',
                                               statCd = c('00001', '00002'))
@@ -57,15 +57,10 @@ na.interp(ts_yuba) %>% autoplot(series = 'Interpolated') +
 # 1990 and onward most complete continuous record
 
 # GHCND:USC00045385
-# yuba1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                           startdate = '1989-01-01', enddate = '1998-12-31', token = token, limit = 130)
-# yuba2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                      startdate = '1999-01-01', enddate = '2003-12-31', token = token, limit = 130)
-# write_rds(yuba1, 'data-raw/yuba_river/yuba1.rds')
-# write_rds(yuba2, 'data-raw/yuba_river/yuba2.rds')
-
-yuba1 <- read_rds('data-raw/yuba_river/yuba1.rds')
-yuba2 <- read_rds('data-raw/yuba_river/yuba2.rds')
+yuba1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                          startdate = '1989-01-01', enddate = '1998-12-31', token = token, limit = 130)
+yuba2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                     startdate = '1999-01-01', enddate = '2003-12-31', token = token, limit = 130)
 
 yuba_air_temp <- yuba1$data %>%
   bind_rows(yuba2$data) %>%
@@ -87,16 +82,11 @@ yuba %>%
 yuba_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = yuba)
 summary(yuba_temp_model)
 
-# yuba3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                      startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
-# yuba4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-#
-# write_rds(yuba3, 'data-raw/yuba_river/yuba3.rds')
-# write_rds(yuba4, 'data-raw/yuba_river/yuba4.rds')
+yuba3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                     startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+yuba4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                     startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
 
-yuba3 <- read_rds('data-raw/yuba_river/yuba3.rds')
-yuba4 <- read_rds('data-raw/yuba_river/yuba4.rds')
 
 yuba_at <- yuba3$data %>%
   bind_rows(yuba4$data) %>%

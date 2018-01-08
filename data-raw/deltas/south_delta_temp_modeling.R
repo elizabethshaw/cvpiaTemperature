@@ -3,7 +3,7 @@ library(lubridate)
 library(CDECRetrieve)
 library(rnoaa)
 
-# middle river at tracy blvd
+# CDEC water temperature on middle river at tracy blvd---------------------
 middle_river <- cdec_query(stations = 'MTB', sensor_num = '25', dur_code = 'E',
                            start_date = '2002-10-30', end_date = '2017-12-31')
 
@@ -55,6 +55,9 @@ ggplot(south_delta, aes(x = date, y = mean_temp_c)) +
 #   ggplot(aes(x = date, y = value)) +
 #   geom_col()
 
+# NOAA air temperature at Stockton, CA airport --------------------------
+
+# Air temperature values for use with temperature model to predict water temperature
 stockton_airport1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
                                 startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 stockton_airport2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
@@ -66,6 +69,7 @@ stockton_airport1$data %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
+# Air temperature values for training temperature model
 stockton_airport3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
                                  startdate = '2002-01-01', enddate = '2011-12-31', token = token, limit = 130)
 stockton_airport4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
@@ -89,6 +93,7 @@ water_temp_training <- south_delta %>%
   ungroup() %>%
   select(date, water_temp_c)
 
+# strong linear relationship between water and air temperature
 water_temp_training %>%
   left_join(air_temp_training) %>%
   ggplot(aes(x = air_temp_c, y = water_temp_c)) +
@@ -98,6 +103,7 @@ water_temp_training %>%
 south_delta_temp <- water_temp_training %>%
   left_join(air_temp_training)
 
+# temperature model water temp as a function of air temp -----------------
 temp_model <- lm(water_temp_c ~ air_temp_c, south_delta_temp)
 summary(temp_model)
 
@@ -106,6 +112,7 @@ south_delta_air_temp_c <- stockton_airport1$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
 
+# use air temp to predict water temp---------
 south_delta_water_temp_pred <- predict(temp_model, south_delta_air_temp_c)
 
 south_delta_water_temp_c <- tibble(

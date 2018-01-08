@@ -4,11 +4,13 @@ library(CDECRetrieve)
 library(rnoaa)
 library(forecast)
 
+# CDEC water temperature near Emmaton---------------------
 emmaton <- cdec_query(stations = 'EMM', sensor_num = '25', dur_code = 'H',
                       start_date = '1999-02-23', end_date = '2017-12-31')
 
 glimpse(emmaton)
 
+# filter out unreliable values and convert to celsius, use water temperature with air temperture to fit model
 north_delta <- emmaton %>%
   mutate(date = as_date(datetime)) %>%
   group_by(date) %>%
@@ -29,7 +31,9 @@ ggplot(north_delta, aes(x = date, y = mean_temp_c)) +
   labs(title = 'emmaton', y = 'monthly mean (°C)') +
   theme_minimal()
 
-# air temp
+# NOAA air temperature near Antioch, CA --------------------------
+
+# Air temperature values for use with temperature model to predict water temperature
 antioch1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                        startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 antioch2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
@@ -41,6 +45,7 @@ antioch1$data %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
+# Air temperature values for training temperature model
 antioch3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                         startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
 antioch4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
@@ -64,6 +69,7 @@ water_temp_training <- north_delta %>%
   ungroup() %>%
   select(date, water_temp_c)
 
+# strong linear relationship between water and air temperature
 water_temp_training %>%
   left_join(air_temp_training) %>%
   filter(!is.na(air_temp_c)) %>%
@@ -75,6 +81,7 @@ north_delta_training <- water_temp_training %>%
   left_join(air_temp_training) %>%
   filter(!is.na(air_temp_c))
 
+# temperature model water temp as a function of air temp -----------------
 north_delta_temp_model <- lm(water_temp_c ~ air_temp_c, north_delta_training)
 summary(north_delta_temp_model)
 
@@ -83,6 +90,7 @@ north_delta_air_temp <- antioch1$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
 
+# need to imupte values for missing air temperature values between 1980-1999 for predicting water temp----------
 ts_north_delta_at <- ts(north_delta_air_temp$air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
 
 na.interp(ts_north_delta_at) %>% autoplot(series = 'Interpolated') +
@@ -92,6 +100,7 @@ north_delta_air_temp_c <- tibble(
   date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
   air_temp_c = as.numeric(na.interp(ts_north_delta_at)))
 
+# use air temp (with impute values) to predict water temp---------
 north_delta_air_pred <- predict(north_delta_temp_model, north_delta_air_temp_c)
 
 north_delta_water_temp_c <- tibble(
@@ -101,8 +110,8 @@ north_delta_water_temp_c <- tibble(
 north_delta_water_temp_c %>%
   ggplot(aes(x = date)) +
   geom_col(aes(y = `North Delta`)) +
-  geom_hline(yintercept = 18) +
-  geom_hline(yintercept = 20) +
+  geom_hline(yintercept = 18, size = .2) +
+  geom_hline(yintercept = 20, size = .2) +
   theme_minimal()
 
 write_rds(north_delta_water_temp_c, 'data-raw/deltas/north_delta_water_temp_c.rds')

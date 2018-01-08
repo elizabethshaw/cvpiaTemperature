@@ -46,15 +46,10 @@ mill_wt <- mill_water_temp %>%
 token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
 
 # RED BLUFF MUNICIPAL AIRPORT, CA US GHCND:USW00024216
-# red_bluff1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                          startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
-# red_bluff2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', startdate = '2008-01-01',
-#                          datatypeid = 'TAVG', enddate = '2017-11-30', token = token, limit = 120)
-# write_rds(red_bluff1, 'data-raw/mill_creek/red_bluff1.rds')
-# write_rds(red_bluff2, 'data-raw/mill_creek/red_bluff2.rds')
-
-red_bluff1 <- read_rds('data-raw/mill_creek/red_bluff1.rds')
-red_bluff2 <- read_rds('data-raw/mill_creek/red_bluff2.rds')
+red_bluff1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                         startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 130)
+red_bluff2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', startdate = '2008-01-01',
+                         datatypeid = 'TAVG', enddate = '2017-11-30', token = token, limit = 120)
 
 mill_at <- red_bluff1$data %>%
   bind_rows(red_bluff2$data) %>%
@@ -72,15 +67,10 @@ mill_creek %>%
 mill_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = mill_creek)
 summary(mill_temp_model)
 
-# red_bluff3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                          startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
-# red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
-#                           startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-# write_rds(red_bluff3, 'data-raw/mill_creek/red_bluff3.rds')
-# write_rds(red_bluff4, 'data-raw/mill_creek/red_bluff4.rds')
-
-red_bluff3 <- read_rds('data-raw/mill_creek/red_bluff3.rds')
-red_bluff4 <- read_rds('data-raw/mill_creek/red_bluff4.rds')
+red_bluff3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                         startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                          startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
 
 red_bluff3$data %>%
   bind_rows(red_bluff4$data) %>%

@@ -27,17 +27,12 @@ butte_water_temp <- bcd %>%
 token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
 
 # model training data 9/1998-9/2017
-# paradise1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1998-01-01',
-#                         datatypeid = 'TAVG', enddate = '2007-12-31', token = token, limit = 120)
-#
-# paradise2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '2008-01-01',
-#                          datatypeid = 'TAVG', enddate = '2017-10-31', token = token, limit = 120)
-#
-# write_rds(paradise1, 'data-raw/butte_creek/paradise1.rds')
-# write_rds(paradise2, 'data-raw/butte_creek/paradise2.rds')
+paradise1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1998-01-01',
+                        datatypeid = 'TAVG', enddate = '2007-12-31', token = token, limit = 120)
 
-paradise1 <- read_rds('data-raw/butte_creek/paradise1.rds')
-paradise2 <- read_rds('data-raw/butte_creek/paradise2.rds')
+paradise2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '2008-01-01',
+                         datatypeid = 'TAVG', enddate = '2017-10-31', token = token, limit = 120)
+
 
 butte_air_temp <- paradise1$data %>%
   bind_rows(paradise2$data) %>%

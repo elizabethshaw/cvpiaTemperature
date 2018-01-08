@@ -60,6 +60,7 @@ monthly_mean_temperature <- temperatures %>%
   select(date, cvpia_watershed)
 
 View(monthly_mean_temperature)
+devtools::use_data(monthly_mean_temperature)
 
 #degday
 #sum daily mean temp over oct and nov
