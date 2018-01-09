@@ -23,16 +23,6 @@ data(package = 'cvpiaTemperature')
 ?cvpiaTemperature::mean_monthly_temperature
 ```
 
-#### About the Models
-Hec5Q
-Measured Values USGS CDEC
-Linear Modeling   
-
-
    
-<a href = "http://www.flowwest.com/" target = "_blank"> 
-  <img src="TransLogoTreb.png" align="left" width="200px"/>
-</a>
-<style type='text/css'>
-img { margin-top: 80px; }
-</style>
+<style>.logo{margin-top: 40px;}</style>
+<div class = 'logo'>Data Assembled and Maintained by <a href = "http://www.flowwest.com/" target = "_blank"> <img src="TransLogoTreb.png" width="150px"/></div>

@@ -54,7 +54,7 @@ A dataset containing the monthly mean water temperature in
 celsius for each CVPIA watershed 1980-1999.
 }
 \details{
-The following three methods were used to estimate the monthly mean water
+The following four methods were used to estimate the monthly mean water
 temperature for the watersheds during 1980-1999:
 
 
@@ -63,12 +63,37 @@ Temperature assignments were determined by Mike Wright using the input files
 for the three HEC-5Q runs, i.e. AR_5QCS.dat and AR_5Q-CL.OUT.
 
 
+\strong{Empirical Data} \cr
+Only the Lower Sacramento had sufficient measured water temperature during
+the period of the CVPIA salmon life cycle model. The few missing values were
+imputed using \href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}.
+
+
 \strong{Additional Temperature Modeling} \cr
- NOAA, CDEC, USGS
+For streams without major dams, water temperature is highly correlated with air temperature.
+For each watershed not included in the HEC-5Q model that had partial water temperature data,
+a linear model was fitted to estimate water temperature as a function of air temperature.
+
+Generally, the air temperature record spans both the period of the CVPIA salmon life cycle model
+and the complete period of record of available water temperature data. In the
+cases where there were missing air temperature values between 1980-1999, we imputed the missing values using
+\href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}
+in order to have a complete air temperature dataset for water temperature estimation.
+
+ Air Temperature Data Source:
+ \itemize{
+   \item NOAA Climate Data Online \href{https://www.ncdc.noaa.gov/cdo-web/}{(CDO)}
+   }
+
+ Stream Water Temperature Data Sources:
+ \itemize{
+   \item DWR California Data Exchange Center \href{http://cdec.water.ca.gov/index.html}{(CDEC)}
+   \item USGS National Water Information System \href{https://waterdata.usgs.gov/nwis}{(NWIS)}
+ }
 
  \strong{Temperature Surrogates} \cr
  For watersheds without representation within the HEC-5Q model and insufficient
- empirical data to generate a model, a nearby modeled stream's temperature estimate
- was selected to represent the watershed's monthly mean temperature.
+ empirical data to generate a model, a nearby modeled stream's temperature estimates
+ were selected to represent the watershed's monthly mean temperature.
 }
 \keyword{datasets}
