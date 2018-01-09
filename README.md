@@ -24,6 +24,15 @@ data(package = 'cvpiaTemperature')
 ```
 
 #### About the Models
-Heq5Q
+Hec5Q
 Measured Values USGS CDEC
-Linear Modeling
+Linear Modeling   
+
+
+   
+<a href = "http://www.flowwest.com/" target = "_blank"> 
+  <img src="TransLogoTreb.png" align="left" width="200px"/>
+</a>
+<style type='text/css'>
+img { margin-top: 80px; }
+</style>
