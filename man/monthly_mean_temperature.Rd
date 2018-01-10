@@ -82,13 +82,13 @@ in order to have a complete air temperature dataset for water temperature estima
 
  Air Temperature Data Source:
  \itemize{
-   \item NOAA Climate Data Online \href{https://www.ncdc.noaa.gov/cdo-web/}{(CDO)}
+   \item NOAA Climate Data Online \href{https://www.ncdc.noaa.gov/cdo-web/}{(CDO)} accessed using the \href{https://github.com/ropensci/rnoaa}{\code{rnoaa}} R package developed by \href{https://ropensci.org/}{rOpenSci}.
    }
 
  Stream Water Temperature Data Sources:
  \itemize{
-   \item DWR California Data Exchange Center \href{http://cdec.water.ca.gov/index.html}{(CDEC)}
-   \item USGS National Water Information System \href{https://waterdata.usgs.gov/nwis}{(NWIS)}
+   \item DWR California Data Exchange Center \href{http://cdec.water.ca.gov/index.html}{(CDEC)} accessed using the \href{https://github.com/flowwest/cdecretrieve}{\code{CDECRetrieve}} R packaged developed by \href{http://www.flowwest.com/}{FlowWest}.
+   \item USGS National Water Information System \href{https://waterdata.usgs.gov/nwis}{(NWIS)} accessed using the \href{https://github.com/USGS-R/dataRetrieval}{\code{dataRetrieval}} R package developed by \href{https://www.usgs.gov/}{USGS}.
  }
 
  \strong{Temperature Surrogates} \cr
