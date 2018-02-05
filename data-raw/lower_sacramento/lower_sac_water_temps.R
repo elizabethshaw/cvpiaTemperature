@@ -5,7 +5,7 @@ library(dataRetrieval)
 
 # lower sacramento river at freeport 1961-10-01 	 2017-12-18
 freeport_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11447650', parameterCd = '00010',
-                                                 startDate = '1980-01-01', endDate = '1999-12-31',
+                                                 startDate = '1979-01-01', endDate = '1999-12-31',
                                                  statCd = c('00001', '00002', '00008'))
 glimpse(freeport_water_temp)
 
@@ -43,7 +43,7 @@ free <- freeport_water_temp %>%
   ungroup() %>%
   select(date, mean_water_temp_c) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
            mean_water_temp_c = 0)
   ) %>%
   group_by(date) %>%
@@ -52,13 +52,13 @@ free <- freeport_water_temp %>%
   mutate(mean_water_temp_c = ifelse(mean_water_temp_c == 0, NA, mean_water_temp_c))
 
 
-ts_freeport <- ts(free$mean_water_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+ts_freeport <- ts(free$mean_water_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
 
 na.interp(ts_freeport) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_freeport, series = 'Original')
 
 lower_sac_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `Lower Sacramento River` = as.numeric(na.interp(ts_freeport)))
 
 
