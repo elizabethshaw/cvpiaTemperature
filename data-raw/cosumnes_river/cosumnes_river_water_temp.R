@@ -6,15 +6,6 @@ library(dataRetrieval)
 
 # cosumnes river at michigan bar ca 1965-10-01  	2016-03-03
 cosum_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11335000', parameterCd = '00010',
-                                                 startDate = '1980-01-01', endDate = '1999-12-31',
-                                                 statCd = c('00001', '00002', '00008'))
-# *** There are no data available on the Waterdata system for the time period specified,
-# although data may be available in the files of the local USGS office operating the station.
-
-glimpse(cosum_water_temp)
-
-
-cosum_water_temp <- dataRetrieval::readNWISdv(siteNumbers = '11335000', parameterCd = '00010',
                                               startDate = '2000-01-01', endDate = '2016-03-03',
                                               statCd = c('00001', '00002', '00008'))
 
@@ -81,14 +72,18 @@ cosum_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = cosum)
 summary(cosum_temp_model)
 
 sac3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatypeid = 'TAVG',
-                     startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
+                    startdate = '1979-01-01', enddate = '1979-12-31', limit = 12, token = token)
 
 sac4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatypeid = 'TAVG',
+                     startdate = '1980-01-01', enddate = '1989-12-31', limit = 120, token = token)
+
+sac5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
 
 
 sac3$data %>%
   bind_rows(sac4$data) %>%
+  bind_rows(sac5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
@@ -96,13 +91,14 @@ sac3$data %>%
 
 sac <- sac3$data %>%
   bind_rows(sac4$data) %>%
+  bind_rows(sac5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value)
 
 cosum_predicted_water_temp <- predict(cosum_temp_model, sac)
 
 cosumnes_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `Cosumnes River` = cosum_predicted_water_temp)
 
 write_rds(cosumnes_water_temp_c, 'data-raw/cosumnes_river/cosumnes_water_temp_c.rds')

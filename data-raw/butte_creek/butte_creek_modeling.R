@@ -68,13 +68,17 @@ confusionMatrix(xtab)
 # chico univ farm, between chico and durham, GHCND:USC00041715, perfect but too much missing data
 # de sabla, GHCND:USC00042402 too north east
 # paradise GHCND:USC00046685, most appropriate for butte creek rearing extent
-paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
+paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1979-01-01',
+                         datatypeid = 'TAVG', enddate = '1979-12-31', token = token, limit = 12)
+
+paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1980-01-01',
                         datatypeid = 'TAVG', enddate = '1989-12-31', token = token, limit = 120)
 
-paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
+paradise5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
                         datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
 paradise3$data %>%
   bind_rows(paradise4$data) %>%
+  bind_rows(paradise5$data) %>%
   mutate(date = ymd_hms(date), year = year(date),
          month = factor(month.abb[month(date)],
                         levels = c(month.abb[10:12], month.abb[1:9]), ordered = TRUE)) %>%
@@ -87,6 +91,7 @@ paradise3$data %>%
 
 paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
+  bind_rows(paradise5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
@@ -99,13 +104,13 @@ paradise_air_temp <- paradise3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
 
 na.interp(ts_paradise) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_paradise, series = 'Original')
 
 butte_air_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_paradise)))
 
 
@@ -119,7 +124,7 @@ paradise_air_temp %>%
 butte_pred_water_temp <- predict(butte_model, butte_air_temp_c)
 
 butte_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `Butte Creek` = butte_pred_water_temp)
 
 butte_water_temp_c %>%

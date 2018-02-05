@@ -2,13 +2,14 @@ library(tidyverse)
 library(lubridate)
 library(rnoaa)
 library(CDECRetrieve)
+library(forecast)
 
-# # big chico BIC cdec query 12/14/2017----------------
+# # big chico BIC cdec query ----------------
 bic <- cdec_query(stations = 'BIC', sensor_num = '25', dur_code = 'H',
            start_date = '1998-09-10', end_date = '2014-12-01')
 
-# rnoaa query 12/14/2017----------------
-# token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file
+# rnoaa query ----------------
+token <- Sys.getenv("token") #noaa cdo api token saved in .Renviron file ex. token='blah'
 # chico <- rnoaa::ncdc(datasetid = 'GSOM', locationid = 'CITY:US060005', datatypeid = 'TAVG',
 #                      startdate = '1998-01-01', enddate = '2007-12-31', token = token, limit = 1000)
 #
@@ -33,6 +34,9 @@ paradise3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', st
 
 paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
                          datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
+
+paradise5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1979-01-01',
+                         datatypeid = 'TAVG', enddate = '1979-12-31', token = token, limit = 12)
 
 
 # really high temps 2002-12, 2003-01, value 708 messing with average
@@ -67,12 +71,6 @@ big_chico_water_temp %>%
   summarise(min = min(date), max = max(date), max-min)
 
 # read saved query-------------------
-# air temps for training model
-paradise1 <- read_rds('data-raw/big_chico_creek/paradise1.rds')
-paradise2 <- read_rds('data-raw/big_chico_creek/paradise2.rds')
-# air temps for predicting water temps
-paradise3 <- read_rds('data-raw/big_chico_creek/paradise3.rds')
-paradise4 <- read_rds('data-raw/big_chico_creek/paradise4.rds')
 
 big_chico_air_temp <- paradise1$data %>%
   bind_rows(paradise2$data) %>%
@@ -113,10 +111,11 @@ confusionMatrix(xtab)
 
 paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
+  bind_rows(paradise5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
            mean_air_temp_c = 0)
   ) %>%
   group_by(date) %>%
@@ -125,13 +124,13 @@ paradise_air_temp <- paradise3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
 
 na.interp(ts_paradise) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_paradise, series = 'Original')
 
 big_chico_air_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_paradise)))
 
 
@@ -145,7 +144,7 @@ paradise_air_temp %>%
 big_chico_pred_water_temp <- predict(big_chico_temp_model, big_chico_air_temp_c)
 
 big_chico_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `Big Chico Creek` = big_chico_pred_water_temp)
 
 big_chico_water_temp_c %>%
