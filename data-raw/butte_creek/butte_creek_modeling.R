@@ -95,7 +95,7 @@ paradise_air_temp <- paradise3$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
            mean_air_temp_c = 0)
   ) %>%
   group_by(date) %>%

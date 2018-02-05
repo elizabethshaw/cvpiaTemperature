@@ -35,30 +35,33 @@ ggplot(north_delta, aes(x = date, y = mean_temp_c)) +
 
 # Air temperature values for use with temperature model to predict water temperature
 antioch1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
-                       startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+                        startdate = '1979-01-01', enddate = '1979-12-31', token = token, limit = 12)
 antioch2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+                       startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+antioch3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
 
 antioch1$data %>%
   bind_rows(antioch2$data) %>%
+  bind_rows(antioch3$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
 # Air temperature values for training temperature model
-antioch3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
-                        startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
 antioch4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+                        startdate = '1999-01-01', enddate = '2008-12-31', token = token, limit = 130)
+antioch5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                         startdate = '2009-01-01', enddate = '2017-12-31', token = token, limit = 130)
 
-antioch3$data %>%
-  bind_rows(antioch4$data) %>%
+antioch4$data %>%
+  bind_rows(antioch5$data) %>%
   mutate(date = ymd_hms(date)) %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
-air_temp_training <- antioch3$data %>%
-  bind_rows(antioch4$data) %>%
+air_temp_training <- antioch4$data %>%
+  bind_rows(antioch5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
 
@@ -87,24 +90,33 @@ summary(north_delta_temp_model)
 
 north_delta_air_temp <- antioch1$data %>%
   bind_rows(antioch2$data) %>%
+  bind_rows(antioch3$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
-  select(date, air_temp_c = value)
+  select(date, air_temp_c = value) %>%
+  bind_rows(
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+           air_temp_c = 0)
+  ) %>%
+  group_by(date) %>%
+  summarise(air_temp_c = max(air_temp_c)) %>%
+  ungroup() %>%
+  mutate(air_temp_c = ifelse(air_temp_c == 0, NA, air_temp_c))
 
 # need to imupte values for missing air temperature values between 1980-1999 for predicting water temp----------
-ts_north_delta_at <- ts(north_delta_air_temp$air_temp_c, start = c(1980, 1), end = c(1999, 12), frequency = 12)
+ts_north_delta_at <- ts(north_delta_air_temp$air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
 
 na.interp(ts_north_delta_at) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_north_delta_at, series = 'Original')
 
 north_delta_air_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   air_temp_c = as.numeric(na.interp(ts_north_delta_at)))
 
 # use air temp (with impute values) to predict water temp---------
 north_delta_air_pred <- predict(north_delta_temp_model, north_delta_air_temp_c)
 
 north_delta_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `North Delta` = north_delta_air_pred)
 
 north_delta_water_temp_c %>%

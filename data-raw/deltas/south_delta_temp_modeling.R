@@ -26,7 +26,7 @@ ggplot(south_delta, aes(x = date, y = mean_temp_c)) +
   annotate_years(2002:2017) +
   geom_hline(yintercept = 18, linetype = 2, size = .2) +
   geom_hline(yintercept = 20, linetype = 2, size = .2) +
-  labs(title = 'emmaton', y = 'monthly mean (°C)') +
+  labs(title = 'middle river', y = 'monthly mean (°C)') +
   theme_minimal()
 
 # air temperature from noa - try a few different sites
@@ -59,30 +59,33 @@ ggplot(south_delta, aes(x = date, y = mean_temp_c)) +
 
 # Air temperature values for use with temperature model to predict water temperature
 stockton_airport1 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
-                                startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+                                 startdate = '1979-01-01', enddate = '1979-12-31', token = token, limit = 130)
 stockton_airport2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
+                                startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
+stockton_airport3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
                                  startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
 
 stockton_airport1$data %>%
   bind_rows(stockton_airport2$data) %>%
+  bind_rows(stockton_airport3$data) %>%
   mutate(date = ymd_hms(date)) %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
 # Air temperature values for training temperature model
-stockton_airport3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
-                                 startdate = '2002-01-01', enddate = '2011-12-31', token = token, limit = 130)
 stockton_airport4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
+                                 startdate = '2002-01-01', enddate = '2011-12-31', token = token, limit = 130)
+stockton_airport5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
                                  startdate = '2012-01-01', enddate = '2017-12-31', token = token, limit = 130)
 
-stockton_airport3$data %>%
-  bind_rows(stockton_airport4$data) %>%
+stockton_airport4$data %>%
+  bind_rows(stockton_airport5$data) %>%
   mutate(date = ymd_hms(date)) %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
 
-air_temp_training <- stockton_airport3$data %>%
-  bind_rows(stockton_airport4$data) %>%
+air_temp_training <- stockton_airport4$data %>%
+  bind_rows(stockton_airport5$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
 
@@ -109,6 +112,7 @@ summary(temp_model)
 
 south_delta_air_temp_c <- stockton_airport1$data %>%
   bind_rows(stockton_airport2$data) %>%
+  bind_rows(stockton_airport3$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
 
@@ -116,7 +120,7 @@ south_delta_air_temp_c <- stockton_airport1$data %>%
 south_delta_water_temp_pred <- predict(temp_model, south_delta_air_temp_c)
 
 south_delta_water_temp_c <- tibble(
-  date = seq.Date(ymd('1980-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
   `South Delta` = south_delta_water_temp_pred)
 
 south_delta_water_temp_c %>%
