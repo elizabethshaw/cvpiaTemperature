@@ -118,10 +118,11 @@ mill_pred_water_temp <- predict(mill_temp_model, mill_air_temp_c)
 
 mill_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Mill Creek` = mill_pred_water_temp)
+  watershed = 'Mill Creek',
+  monthly_mean_temp_c = mill_pred_water_temp)
 
 mill_water_temp_c %>%
-  ggplot(aes(x = date, y = `Mill Creek`)) +
+  ggplot(aes(x = date, y = monthly_mean_temp_c)) +
   geom_col()
 
 write_rds(mill_water_temp_c, 'data-raw/mill_creek/mill_creek_water_temp_c.rds')

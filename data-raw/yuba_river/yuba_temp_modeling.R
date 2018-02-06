@@ -122,11 +122,12 @@ yuba_pred_water_temp <- predict(yuba_temp_model, yuba_air_temp_c)
 
 yuba_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Yuba River` = yuba_pred_water_temp)
+  watershed = 'Yuba River',
+  monthly_mean_temp_c = yuba_pred_water_temp)
 
 yuba_water_temp_c %>%
   ggplot(aes(x = date)) +
-  geom_col(aes(y = `Yuba River`), alpha = .4, fill = 'red') +
+  geom_col(aes(y = monthly_mean_temp_c), alpha = .4, fill = 'red') +
   geom_col(data = yuba_water, aes(y = mean_water_temp_c), alpha = .4, fill = 'blue') +
   geom_hline(yintercept = 18) +
   geom_hline(yintercept = 20) +

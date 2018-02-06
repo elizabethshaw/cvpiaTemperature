@@ -111,10 +111,11 @@ moke_predicted_water_temp <- predict(moke_temp_model, moke_air_temp_c)
 
 moke_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Mokelumne River` = moke_predicted_water_temp)
+  watershed = 'Mokelumne River',
+  monthly_mean_temp_c = moke_predicted_water_temp)
 
 moke_water_temp_c %>%
-  ggplot(aes(x = date, y = `Mokelumne River`)) +
+  ggplot(aes(x = date, y = monthly_mean_temp_c)) +
   geom_col(alpha = .2) +
   geom_col(data = victor_mean_temps, aes(y = mean_water_temp_c), alpha = .4) +
   geom_hline(yintercept = 18)

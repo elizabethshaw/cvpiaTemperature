@@ -145,11 +145,12 @@ big_chico_pred_water_temp <- predict(big_chico_temp_model, big_chico_air_temp_c)
 
 big_chico_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Big Chico Creek` = big_chico_pred_water_temp)
+  watershed = 'Big Chico Creek',
+  monthly_mean_temp_c = big_chico_pred_water_temp)
 
 big_chico_water_temp_c %>%
   ggplot(aes(x = date)) +
-  geom_line(aes(y = `Big Chico Creek`), color = 'red') +
+  geom_line(aes(y = monthly_mean_temp_c), color = 'red') +
   geom_line(data = big_chico_air_temp_c, aes(y = mean_air_temp_c))
 
 write_rds(big_chico_water_temp_c, 'data-raw/big_chico_creek/big_chico_creek_water_temp_c.rds')

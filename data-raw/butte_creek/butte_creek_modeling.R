@@ -125,10 +125,11 @@ butte_pred_water_temp <- predict(butte_model, butte_air_temp_c)
 
 butte_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Butte Creek` = butte_pred_water_temp)
+  watershed = 'Butte Creek',
+  monthly_mean_temp_c = butte_pred_water_temp)
 
 butte_water_temp_c %>%
   ggplot(aes(x = date)) +
-  geom_col(aes(y = `Butte Creek`))
+  geom_col(aes(y = monthly_mean_temp_c))
 
 write_rds(butte_water_temp_c, 'data-raw/butte_creek/butte_creek_water_temp_c.rds')

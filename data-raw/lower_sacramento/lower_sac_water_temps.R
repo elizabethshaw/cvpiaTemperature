@@ -59,11 +59,12 @@ na.interp(ts_freeport) %>% autoplot(series = 'Interpolated') +
 
 lower_sac_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Lower Sacramento River` = as.numeric(na.interp(ts_freeport)))
+  watershed = 'Lower Sacramento River',
+  monthly_mean_temp_c = as.numeric(na.interp(ts_freeport)))
 
 
 lower_sac_water_temp_c %>%
-  ggplot(aes(x = date, y = `Lower Sacramento River`)) +
+  ggplot(aes(x = date, y = monthly_mean_temp_c)) +
   geom_col(fill = 'darkgoldenrod2') +
   geom_col(data = free, aes(x = date, y = mean_water_temp_c)) +
   theme_minimal() +

@@ -15,7 +15,8 @@ reference:
 - title: Temperature Datasets
   desc: Temperature related data sets used by the CVPIA Salmon Population Model
   contents:
-  - monthly_mean_temperature
+  - juv_temp
+  - deg_days
 
 navbar:
   type: default

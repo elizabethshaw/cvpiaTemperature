@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • cvpiaTemperature</title>
+<title>Monthly Accumulated Degree Days — deg_days • cvpiaTemperature</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -37,7 +37,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -72,52 +72,54 @@
       </header>
 
       <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;0.1.0</small>
-      </h1>
+    <h1>Monthly Accumulated Degree Days</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    
+    <p>dio</p>
+    
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <pre class="usage"><span class='no'>deg_days</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-temperature-datasets" class="hasAnchor"><a href="#section-temperature-datasets" class="anchor"></a>Temperature Datasets</h2>
-            <p class="section-desc"><p>Temperature related data sets used by the CVPIA Salmon Population Model</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="juv_temp.html">juv_temp</a></code> </p>
-          </td>
-          <td><p>Monthly Mean Water Temperature</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="deg_days.html">deg_days</a></code> </p>
-          </td>
-          <td><p>Monthly Accumulated Degree Days</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+    <dl class='dl-horizontal'>
+  <dt>date</dt><dd><p>calendar date, monthly value 1980-1999</p></dd>
+  <dt>watershed</dt><dd><p>CVPIA watershed name</p></dd>
+  <dt>degdays</dt><dd><p>monthly ATU in °C</p></dd>
+</dl>
+    
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <ul>
+<li><p>HEC-5Q Model Output: Michael Wright <a href='mailto:mwright@usbr.gov'>mwright@usbr.gov</a></p></li>
+<li><p>Data Wrangling and Additional Temperature Modeling: Sadie Gill  <a href='mailto:sgill@flowwest.com'>sgill@flowwest.com</a></p></li>
+<li><p>Temperature Surrogate Selection: Mark Tompkins <a href='mailto:mtompkins@flowwest.com'>mtompkins@flowwest.com</a> and Mike Urkov <a href='mailto:mike.urkov@gmail.com'>mike.urkov@gmail.com</a></p></li>
+</ul>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For watersheds with HEC-5Q modeled results, degree days was calculated by
+summing the daily mean values of the month.</p>
+<p>For the other regions, degree days was caluclated by multiplying the monthly mean
+temperature with the number of days in the month.</p>
+<p>For more details about the temperature modeling see <code><a href='juv_temp.html'>juv_temp</a></code></p>
+    
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-temperature-datasets">Temperature Datasets</a></li>
-    </ul>
+      
+      <li><a href="#format">Format</a></li>
+
+      <li><a href="#source">Source</a></li>
+
+      <li><a href="#details">Details</a></li>
+          </ul>
+
   </div>
 </div>
 

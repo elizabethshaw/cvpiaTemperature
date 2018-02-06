@@ -172,11 +172,12 @@ deer_predicted_water_temp <- predict(deer_water_temp_model, deer_air_temp_c)
 
 deer_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Deer Creek` = deer_predicted_water_temp)
+  watershed = 'Deer Creek',
+  monthly_mean_temp_c = deer_predicted_water_temp)
 
 deer_water_temp_c %>%
   ggplot(aes(x = date)) +
-  geom_line(aes(y = `Deer Creek`)) +
+  geom_line(aes(y = monthly_mean_temp_c)) +
   geom_hline(yintercept = 18) +
   geom_hline(yintercept = 20) +
   theme_minimal()

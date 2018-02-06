@@ -99,6 +99,7 @@ cosum_predicted_water_temp <- predict(cosum_temp_model, sac)
 
 cosumnes_water_temp_c <- tibble(
   date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
-  `Cosumnes River` = cosum_predicted_water_temp)
+  watershed = 'Cosumnes River',
+  monthly_mean_temp_c = cosum_predicted_water_temp)
 
 write_rds(cosumnes_water_temp_c, 'data-raw/cosumnes_river/cosumnes_water_temp_c.rds')
