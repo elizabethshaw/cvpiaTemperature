@@ -20,7 +20,7 @@ This package provides flow related datasets to the [`cvpiaData`](https://flowwes
 data(package = 'cvpiaTemperature')
 
 # explore temperature modeling metadata
-?cvpiaTemperature::mean_monthly_temperature
+?cvpiaTemperature::juv_temp
 ```
 
    
