@@ -16,6 +16,7 @@ reference:
   desc: Temperature related data sets used by the CVPIA Salmon Population Model
   contents:
   - juv_temp
+  - delta_temps
   - deg_days
 
 navbar:

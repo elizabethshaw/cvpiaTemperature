@@ -134,20 +134,10 @@ deg_days %>%
   facet_wrap(~watershed)
 
 # delta temps ----------------------------------
-# North Delta use USGS 11455420 SACRAMENTO R A RIO VISTA CA
+dn <- read_rds('data-raw/deltas/north_delta_water_temp_c.rds')
+ds <- read_rds('data-raw/deltas/south_delta_water_temp_c.rds')
+delta_temps <- dn %>%
+  left_join(ds) %>%
+  gather(watershed, monthly_mean_temp_c, -date)
 
-# South Delta use FMWT midwater trawl data
-sd_temp <- read_excel('data-raw/FMWT 1967-2016 Catch Matrix_updated.xlsx', sheet = 'FlatFile')
-
-glimpse(sd_temp)
-sd_temp %>%
-  select(date = Date, station = Station, temp_C = `Top Temperature (⁰C)`) %>%
-  filter(date >= '1980-01-01') %>%
-  group_by(month = month(date)) %>% summarise(count = n()) %>% View()
-  group_by(year = year(date), month = month(date), station) %>%
-  summarise(monthly_mean_tempC = mean(temp_C, na.rm = TRUE)) %>%
-  arrange(year, month, station) %>% View()
-  ungroup() %>%
-  group_by(station) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>% View()
+use_data(delta_temps)

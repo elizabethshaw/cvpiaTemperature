@@ -97,11 +97,11 @@
 #'
 "juv_temp"
 
-#' Monthly Accumulated Degree Days
+#' Degree Days
 #'
-#' @description dio
+#' @description The monthly accumulated degree days (celsius)
 #'
-#' @format
+#' @format dataframe with 7,812 rows and 3 variables
 #' \describe{
 #'   \item{date}{calendar date, monthly value 1980-1999}
 #'   \item{watershed}{CVPIA watershed name}
@@ -125,3 +125,40 @@
 #' }
 #'
 "deg_days"
+
+#' Delta Temperature
+#'
+#' @description Rearing temperature in the North and South Delta
+#'
+#' @format dataframe with 504 rows and 3 variables
+#' \describe{
+#'   \item{date}{calendar date, monthly value 1980-1999}
+#'   \item{watershed}{CVPIA watershed name}
+#'   \item{monthly_mean_temp_c}{modeled monthly mean temperature in °C}
+#' }
+#'
+#' @details
+#' The deltas' water temperature was modeled as a function of air temperature.
+#'
+#' North Delta was modeled using a sample of recent measured water temperature at
+#' CDEC station \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=EMM}{EMM}
+#' and NOAA CDO air temperature data from \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USC00040232/detail}{Antioch}.
+#'
+#' South Delta was modeled using a sample of recent measured water temperature at
+#' CDEC station \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=MTB}{MTB}
+#' and NOAA CDO air temperature data \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USW00023237/detail}{Stockton Airport}.
+#'
+#' Air Temperature Data Source:
+#'  \itemize{
+#'    \item NOAA Climate Data Online \href{https://www.ncdc.noaa.gov/cdo-web/}{(CDO)} accessed using the \href{https://github.com/ropensci/rnoaa}{\code{rnoaa}} R package developed by \href{https://ropensci.org/}{rOpenSci}.
+#'    }
+#'
+#'  Stream Water Temperature Data Sources:
+#'  \itemize{
+#'    \item DWR California Data Exchange Center \href{http://cdec.water.ca.gov/index.html}{(CDEC)} accessed using the \href{https://github.com/flowwest/cdecretrieve}{\code{CDECRetrieve}} R packaged developed by \href{http://www.flowwest.com/}{FlowWest}.
+#'  }
+#'
+#' @source
+#' Data Wrangling and Additional Temperature Modeling: Sadie Gill  \email{sgill@@flowwest.com}
+#'
+"delta_temps"

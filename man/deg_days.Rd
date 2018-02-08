@@ -3,8 +3,9 @@
 \docType{data}
 \name{deg_days}
 \alias{deg_days}
-\title{Monthly Accumulated Degree Days}
-\format{\describe{
+\title{Degree Days}
+\format{dataframe with 7,812 rows and 3 variables
+\describe{
   \item{date}{calendar date, monthly value 1980-1999}
   \item{watershed}{CVPIA watershed name}
   \item{degdays}{monthly ATU in °C}
@@ -20,7 +21,7 @@
 deg_days
 }
 \description{
-dio
+The monthly accumulated degree days (celsius)
 }
 \details{
 For watersheds with HEC-5Q modeled results, degree days was calculated by
