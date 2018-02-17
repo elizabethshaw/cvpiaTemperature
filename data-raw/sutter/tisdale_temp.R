@@ -47,8 +47,23 @@ library(lubridate)
 #   geom_col()
 #
 # bind_rows(t11, t12, t13, t14, t15, t16, t17) %>%
-#   filter(!is.na(date), date != '2016-12-31') %>%
+#   filter(!is.na(date)) %>%
 #   write_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.csv')
 
 # read in cleaned water temp data
 sutter_water_temp <- read_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.csv')
+
+sutter_water_temp %>%
+  mutate(water_temp_c = (water_temp_f - 32) * 5/9) %>%
+  ggplot(aes(x = date, y = water_temp_c)) +
+  geom_col(position = 'dodge')
+
+sutter_water_temp %>%
+  mutate(water_temp_c = (water_temp_f - 32) * 5/9) %>%
+  group_by(year = year(date), month = month(date)) %>%
+  summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
+  mutate(month = factor(month, levels = c(10:12, 1:9), labels = month.abb[c(10:12, 1:9)])) %>%
+  ggplot(aes(x = year, y = mean_temp_c, color = month)) +
+  geom_point() +
+  geom_hline(yintercept = 20) +
+  theme_minimal()
