@@ -13,7 +13,7 @@ devtools::install_github("FlowWest/cvpiaTemperature")
 ```
 
 #### Usage
-This package provides flow related datasets to the [`cvpiaData`](https://flowwest.github.io/cvpiaData/) package.
+This package provides temperature related datasets to the [`cvpiaData`](https://flowwest.github.io/cvpiaData/) package.
 
 ``` r
 # datasets within the package
