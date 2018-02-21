@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • cvpiaTemperature</title>
+<title>Migratory Corridor Water Temperature — prop_temp_over_20_migratory_corridor • cvpiaTemperature</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -37,7 +37,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -72,64 +72,59 @@
       </header>
 
       <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;0.1.0</small>
-      </h1>
+    <h1>Migratory Corridor Water Temperature</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    
+    <p>The median proportion of days over 20°C per month</p>
+    
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <pre class="usage"><span class='no'>prop_temp_over_20_migratory_corridor</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-temperature-datasets" class="hasAnchor"><a href="#section-temperature-datasets" class="anchor"></a>Temperature Datasets</h2>
-            <p class="section-desc"><p>Temperature related data sets used by the CVPIA Salmon Population Model</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="juv_temp.html">juv_temp</a></code> </p>
-          </td>
-          <td><p>Monthly Mean Water Temperature</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="delta_temps.html">delta_temps</a></code> </p>
-          </td>
-          <td><p>Delta Temperature</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="deg_days.html">deg_days</a></code> </p>
-          </td>
-          <td><p>Degree Days</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="prop_temp_over_20_migratory_corridor.html">prop_temp_over_20_migratory_corridor</a></code> </p>
-          </td>
-          <td><p>Migratory Corridor Water Temperature</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+    <p>dataframe with 300 rows and 4 variables</p><dl class='dl-horizontal'>
+  <dt>order</dt><dd><p>ordering of watersheds within salmon life cycle model</p></dd>
+  <dt>watershed</dt><dd><p>CVPIA watershed</p></dd>
+  <dt>month</dt><dd><p>integer representation of calendar month</p></dd>
+  <dt>median_p20</dt><dd><p>median proportion of temperature over 20°C</p></dd>
+</dl>
+    
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Sadie Gill <a href='mailto:sgill@flowwest.com'>sgill@flowwest.com</a></p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Watersheds were assigned membership to one of the following three locations to
+represent the migratory corridor temperature conditions. The data was summarised
+by calculating the median proportion of days over 20°C during the available period of record.</p>
+<p>Sacramento River, <a href='http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=WLK'>Sacramento River Below Wilkins Slough</a>:
+Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek
+Cow Creek, Deer Creek, Elder Creek, Mill Creek, Paynes Creek, Stony Creek, Thomes Creek, Bear River, Feather River, Yuba River
+American River</p>
+<p>South Delta, <a href='http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=MOK'>Mokelumne River At San Joaquin River</a>:
+Calaveras River, Cosumnes River, Mokelumne River</p>
+<p>San Joaquin River, <a href='https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&amp;site_no=11303500'>San Joaquin River Near Vernalis</a>:
+Merced River, Stanislaus River, Tuolumne River</p>
+<p>NA (no spawning in these regions):
+Upper-mid Sacramento River, Sutter Bypass, Lower-mid Sacramento River, Yolo Bypass, Lower Sacramento River, San Joaquin River</p>
+    
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-temperature-datasets">Temperature Datasets</a></li>
-    </ul>
+      
+      <li><a href="#format">Format</a></li>
+
+      <li><a href="#source">Source</a></li>
+
+      <li><a href="#details">Details</a></li>
+          </ul>
+
   </div>
 </div>
 
