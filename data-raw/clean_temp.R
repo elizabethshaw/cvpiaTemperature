@@ -2,7 +2,6 @@ library(tidyverse)
 library(readxl)
 library(lubridate)
 library(stringr)
-library(ggsci)
 
 # mike wright's notes on temperature
 
@@ -58,7 +57,7 @@ monthly_mean_temperature <- temperatures %>%
          `Bear Creek` = `Cow Creek`,
          `Elder Creek` = `Thomes Creek`,
          `Paynes Creek` = `Cow Creek`,
-         `Bear River` = NA,
+         `Bear River` = `Yuba River`,
          `Feather River` = `American River`,
          `Calaveras River` = `Mokelumne River`,
          `Yolo Bypass` = NA,
