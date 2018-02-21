@@ -103,7 +103,7 @@
 #'
 #' @format dataframe with 7,812 rows and 3 variables
 #' \describe{
-#'   \item{date}{calendar date, monthly value 1980-1999}
+#'   \item{date}{calendar date, monthly value 1979-1999}
 #'   \item{watershed}{CVPIA watershed name}
 #'   \item{degdays}{monthly ATU in °C}
 #' }
@@ -195,4 +195,4 @@
 #' Upper-mid Sacramento River, Sutter Bypass, Lower-mid Sacramento River, Yolo Bypass, Lower Sacramento River, San Joaquin River
 #'
 #' @source Sadie Gill \email{sgill@@flowwest.com}
-"prop_temp_over_20_migratory_corridor"
+"prop_temp_over_20_migr_cor"

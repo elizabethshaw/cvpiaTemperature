@@ -147,11 +147,11 @@ other_sheds <- tibble(order = rep(missing$order, 12),
        month = rep(1:12, each = 6),
        median_p20 = NA)
 
-prop_temp_over_20_migratory_corridor <- median_p20 %>%
+prop_temp_over_20_migr_cor <- median_p20 %>%
   left_join(watershed_groups) %>%
   select(order, watershed, month, median_p20) %>%
   bind_rows(other_sheds) %>%
   arrange(month, order)
 
-devtools::use_data(prop_temp_over_20_migratory_corridor, overwrite = TRUE)
+devtools::use_data(prop_temp_over_20_migr_cor, overwrite = TRUE)
 

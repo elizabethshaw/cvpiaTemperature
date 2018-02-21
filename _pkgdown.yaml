@@ -18,7 +18,7 @@ reference:
   - juv_temp
   - delta_temps
   - deg_days
-  - prop_temp_over_20_migratory_corridor
+  - prop_temp_over_20_migr_cor
 
 navbar:
   type: default

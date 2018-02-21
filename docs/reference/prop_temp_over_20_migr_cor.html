@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Degree Days — deg_days • cvpiaTemperature</title>
+<title>Migratory Corridor Water Temperature — prop_temp_over_20_migr_cor • cvpiaTemperature</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -74,38 +74,43 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Degree Days</h1>
+    <h1>Migratory Corridor Water Temperature</h1>
     </div>
 
     
-    <p>The monthly accumulated degree days (celsius)</p>
+    <p>The median proportion of days over 20°C per month</p>
     
 
-    <pre class="usage"><span class='no'>deg_days</span></pre>
+    <pre class="usage"><span class='no'>prop_temp_over_20_migr_cor</span></pre>
         
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>dataframe with 7,812 rows and 3 variables</p><dl class='dl-horizontal'>
-  <dt>date</dt><dd><p>calendar date, monthly value 1979-1999</p></dd>
-  <dt>watershed</dt><dd><p>CVPIA watershed name</p></dd>
-  <dt>degdays</dt><dd><p>monthly ATU in °C</p></dd>
+    <p>dataframe with 300 rows and 4 variables</p><dl class='dl-horizontal'>
+  <dt>order</dt><dd><p>ordering of watersheds within salmon life cycle model</p></dd>
+  <dt>watershed</dt><dd><p>CVPIA watershed</p></dd>
+  <dt>month</dt><dd><p>integer representation of calendar month</p></dd>
+  <dt>median_p20</dt><dd><p>median proportion of temperature over 20°C</p></dd>
 </dl>
     
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <ul>
-<li><p>HEC-5Q Model Output: Michael Wright <a href='mailto:mwright@usbr.gov'>mwright@usbr.gov</a></p></li>
-<li><p>Data Wrangling and Additional Temperature Modeling: Sadie Gill  <a href='mailto:sgill@flowwest.com'>sgill@flowwest.com</a></p></li>
-<li><p>Temperature Surrogate Selection: Mark Tompkins <a href='mailto:mtompkins@flowwest.com'>mtompkins@flowwest.com</a> and Mike Urkov <a href='mailto:mike.urkov@gmail.com'>mike.urkov@gmail.com</a></p></li>
-</ul>
+    <p>Sadie Gill <a href='mailto:sgill@flowwest.com'>sgill@flowwest.com</a></p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For watersheds with HEC-5Q modeled results, degree days was calculated by
-summing the daily mean values of the month.</p>
-<p>For the other regions, degree days was caluclated by multiplying the monthly mean
-temperature with the number of days in the month.</p>
-<p>For more details about the temperature modeling see <code><a href='juv_temp.html'>juv_temp</a></code></p>
+    <p>Watersheds were assigned membership to one of the following three locations to
+represent the migratory corridor temperature conditions. The data was summarised
+by calculating the median proportion of days over 20°C during the available period of record.</p>
+<p>Sacramento River, <a href='http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=WLK'>Sacramento River Below Wilkins Slough</a>:
+Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek
+Cow Creek, Deer Creek, Elder Creek, Mill Creek, Paynes Creek, Stony Creek, Thomes Creek, Bear River, Feather River, Yuba River
+American River</p>
+<p>South Delta, <a href='http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=MOK'>Mokelumne River At San Joaquin River</a>:
+Calaveras River, Cosumnes River, Mokelumne River</p>
+<p>San Joaquin River, <a href='https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&amp;site_no=11303500'>San Joaquin River Near Vernalis</a>:
+Merced River, Stanislaus River, Tuolumne River</p>
+<p>NA (no spawning in these regions):
+Upper-mid Sacramento River, Sutter Bypass, Lower-mid Sacramento River, Yolo Bypass, Lower Sacramento River, San Joaquin River</p>
     
 
   </div>

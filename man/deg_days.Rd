@@ -6,7 +6,7 @@
 \title{Degree Days}
 \format{dataframe with 7,812 rows and 3 variables
 \describe{
-  \item{date}{calendar date, monthly value 1980-1999}
+  \item{date}{calendar date, monthly value 1979-1999}
   \item{watershed}{CVPIA watershed name}
   \item{degdays}{monthly ATU in °C}
 }}
