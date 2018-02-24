@@ -102,9 +102,15 @@ bind_rows(y04, y05, y06, y08, y09, y10, y11, y12, y13, y14, y15, y16, y17, y18) 
   write_csv('data-raw/yolo/cleaned_yolo_water_temp04_18.csv')
 
 # read in cleaned water temp data
-yolo_water_temp <- read_csv('data-raw/yolo/cleaned_yolo_water_temp04_18.csv')
-
-yolo_water_temp %>%
+yolo_water_temp <- read_csv('data-raw/yolo/cleaned_yolo_water_temp04_18.csv') %>%
   mutate(water_temp_c = (water_temp_f - 32) * 5/9) %>%
   group_by(month = month(date)) %>%
-  summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE), n())
+  summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
+  bind_rows(tibble(month = 7, mean_temp_c = 20)) %>%
+  arrange(month)
+
+tibble(
+  date = seq(as.Date('1980-01-01'), as.Date('1999-12-31'), by = 'month'),
+  watershed = 'Yolo Bypass',
+  monthly_mean_temp_c = rep(yolo_water_temp$mean_temp_c, times = 20)
+) %>% write_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')

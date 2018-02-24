@@ -51,19 +51,13 @@ library(lubridate)
 #   write_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.csv')
 
 # read in cleaned water temp data
-sutter_water_temp <- read_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.csv')
-
-sutter_water_temp %>%
+sutter_water_temp <- read_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.csv') %>%
   mutate(water_temp_c = (water_temp_f - 32) * 5/9) %>%
-  ggplot(aes(x = date, y = water_temp_c)) +
-  geom_col(position = 'dodge')
+  group_by(month = month(date)) %>%
+  summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE))
 
-sutter_water_temp %>%
-  mutate(water_temp_c = (water_temp_f - 32) * 5/9) %>%
-  group_by(year = year(date), month = month(date)) %>%
-  summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE)) %>%
-  mutate(month = factor(month, levels = c(10:12, 1:9), labels = month.abb[c(10:12, 1:9)])) %>%
-  ggplot(aes(x = year, y = mean_temp_c, color = month)) +
-  geom_point() +
-  geom_hline(yintercept = 20) +
-  theme_minimal()
+tibble(
+  date = seq(as.Date('1980-01-01'), as.Date('1999-12-31'), by = 'month'),
+  watershed = 'Sutter Bypass',
+  monthly_mean_temp_c = rep(sutter_water_temp$mean_temp_c, times = 20)
+) %>% write_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')

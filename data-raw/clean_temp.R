@@ -52,6 +52,8 @@ monthly_mean_temperature <- temperatures %>%
   bind_rows(read_rds('data-raw/mill_creek/mill_creek_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/mokelumne_river/mokelumne_river_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds')) %>%
+  bind_rows(read_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')) %>%
+  bind_rows(read_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')) %>%
   spread(watershed, monthly_mean_temp_c) %>%
   mutate(`Antelope Creek` = `Cow Creek`,
          `Bear Creek` = `Cow Creek`,
@@ -59,9 +61,7 @@ monthly_mean_temperature <- temperatures %>%
          `Paynes Creek` = `Cow Creek`,
          `Bear River` = `Yuba River`,
          `Feather River` = `American River`,
-         `Calaveras River` = `Mokelumne River`,
-         `Yolo Bypass` = NA,
-         `Sutter Bypass` = NA) %>%
+         `Calaveras River` = `Mokelumne River`) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
 juv_temp <- monthly_mean_temperature %>%
