@@ -20,7 +20,7 @@ delta_temps
 Rearing temperature in the North and South Delta
 }
 \details{
-The deltas' water temperature was modeled as a function of air temperature.
+Water temperature in the Delta was modeled as a function of air temperature.
 
 North Delta was modeled using a sample of recent measured water temperature at
 CDEC station \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=EMM}{EMM}

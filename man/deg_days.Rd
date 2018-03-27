@@ -24,11 +24,11 @@ deg_days
 The monthly accumulated degree days (celsius)
 }
 \details{
-For watersheds with HEC-5Q modeled results, degree days was calculated by
-summing the daily mean values of the month.
+For watersheds with HEC-5Q modeled results, the calculation for degree days
+is the sum of the daily mean values for each month.
 
-For the other regions, degree days was caluclated by multiplying the monthly mean
-temperature with the number of days in the month.
+For the other regions, the calculation for degree days is the monthly mean
+temperature multiplied by the number of days in the month.
 
 For more details about the temperature modeling see \code{\link{juv_temp}}
 }

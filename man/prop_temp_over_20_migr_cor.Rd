@@ -23,10 +23,10 @@ The median proportion of days over 20°C per month
 \details{
 Watersheds were assigned membership to one of the following three locations to
 represent the migratory corridor temperature conditions. The data was summarised
-by calculating the median proportion of days over 20°C during the available period of record.
+by calculating the median proportion of days over 20°C for each month during the available period of record.
 
 Sacramento River, \href{http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=WLK}{Sacramento River Below Wilkins Slough}:
-Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek
+Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek,
 Cow Creek, Deer Creek, Elder Creek, Mill Creek, Paynes Creek, Stony Creek, Thomes Creek, Bear River, Feather River, Yuba River
 American River
 

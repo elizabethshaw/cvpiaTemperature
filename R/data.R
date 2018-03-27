@@ -109,11 +109,11 @@
 #' }
 #'
 #' @details
-#' For watersheds with HEC-5Q modeled results, degree days was calculated by
-#' summing the daily mean values of the month.
+#' For watersheds with HEC-5Q modeled results, the calculation for degree days
+#' is the sum of the daily mean values for each month.
 #'
-#' For the other regions, degree days was caluclated by multiplying the monthly mean
-#' temperature with the number of days in the month.
+#' For the other regions, the calculation for degree days is the monthly mean
+#' temperature multiplied by the number of days in the month.
 #'
 #' For more details about the temperature modeling see \code{\link{juv_temp}}
 #'
@@ -138,7 +138,7 @@
 #' }
 #'
 #' @details
-#' The deltas' water temperature was modeled as a function of air temperature.
+#' Water temperature in the Delta was modeled as a function of air temperature.
 #'
 #' North Delta was modeled using a sample of recent measured water temperature at
 #' CDEC station \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=EMM}{EMM}
@@ -178,10 +178,10 @@
 #' @details
 #' Watersheds were assigned membership to one of the following three locations to
 #' represent the migratory corridor temperature conditions. The data was summarised
-#' by calculating the median proportion of days over 20°C during the available period of record.
+#' by calculating the median proportion of days over 20°C for each month during the available period of record.
 #'
 #' Sacramento River, \href{http://cdec.water.ca.gov/dynamicapp/staMeta?station_id=WLK}{Sacramento River Below Wilkins Slough}:
-#' Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek
+#' Upper Sacramento River, Antelope Creek, Battle Creek, Bear Creek, Big Chico Creek Butte Creek, Clear Creek, Cottonwood Creek,
 #' Cow Creek, Deer Creek, Elder Creek, Mill Creek, Paynes Creek, Stony Creek, Thomes Creek, Bear River, Feather River, Yuba River
 #' American River
 #'
