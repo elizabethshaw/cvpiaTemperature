@@ -1,7 +1,7 @@
 Package: cvpiaTemperature
 Type: Package
 Title: Modeled Temperature Data for the CVPIA SIT Model
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: person('Sadie', 'Gill', email = 'sgill@flowwest.com', role = c('cre', 'aut'))
 Description: This data package contains modeled temperature data for each of the watersheds 
     within the CVPIA salmon life cycle model.
