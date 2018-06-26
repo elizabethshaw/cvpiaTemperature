@@ -69,12 +69,12 @@
 #'    \item \strong{Stony Creek} HEC-5Q model  output at STONY CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Thomes Creek} HEC-5Q model output at THOMES CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Upper-mid Sacramento River} HEC-5Q model output at STONY CREEK in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
-#'    \item \strong{Sutter Bypass} TBD
+#'    \item \strong{Sutter Bypass} Tisdale Rotary Screw Trap montly mean water temperature 2011-2017
 #'    \item \strong{Bear River} Yuba River temperature used as surrogate
 #'    \item \strong{Feather River} American River temperatue used as surrogate
 #'    \item \strong{Yuba River} Estimated mean monthly water temperature from a linear model fitted with water temperature data from USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11421000}{11421000} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USW00024216/detail}{USW00024216}
 #'    \item \strong{Lower-mid Sacramento River} HEC-5Q model output at KNIGHTS LDG in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
-#'    \item \strong{Yolo Bypass} TBD
+#'    \item \strong{Yolo Bypass} Knights Landing Rotary Screw Trap montly mean water temperature 2004-2018
 #'    \item \strong{American River} HEC-5Q model output at WILLIAM POND PARK in SSJB_AR_Reference_063015/AR/AR_CL_Temp.dss
 #'    \item \strong{Lower Sacramento River} Measured mean monthly water temperature from  USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11447650}{11447650} with imputed missing values using \href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}
 #'    \item \strong{Calaveras River} Mokelumne River temperatue used as surrogate
