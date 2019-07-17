@@ -111,8 +111,7 @@ deg_days <- zero_degday %>%
   bind_rows(hec5q_degday) %>%
   bind_rows(estimate_degday)
 
-View(deg_days)
-use_data(deg_days, overwrite = TRUE)
+devtools::use_data(deg_days, overwrite = TRUE)
 
 deg_days %>%
   spread(date, degdays) %>%
