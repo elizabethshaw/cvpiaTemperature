@@ -34,6 +34,11 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
+# mike wright has also provided estimates for Antelope Creek, Bear Creek, Elder
+# Creek, Paynes Creek, Bear River, Feather River, and Calaveras River using a
+# regression analysis. More details can be found in
+# 'data-raw/mike_wright_temperature_regression/create_estimated_timeseries.r'
+
 # add additional modeled temperature data from sadie
 monthly_mean_temperature <- temperatures %>%
   group_by(year = year(date), month = month(date), watershed) %>%
@@ -54,14 +59,8 @@ monthly_mean_temperature <- temperatures %>%
   bind_rows(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')) %>%
+  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>%
   spread(watershed, monthly_mean_temp_c) %>%
-  mutate(`Antelope Creek` = `Cow Creek`,
-         `Bear Creek` = `Cow Creek`,
-         `Elder Creek` = `Thomes Creek`,
-         `Paynes Creek` = `Cow Creek`,
-         `Bear River` = `Yuba River`,
-         `Feather River` = `American River`,
-         `Calaveras River` = `Mokelumne River`) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
 juv_temp <- monthly_mean_temperature %>%
