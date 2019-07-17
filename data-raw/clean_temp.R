@@ -95,9 +95,8 @@ hec5q_degday <- temperatures %>%
 estimate_watersheds <- cvpia_watershed[!cvpia_watershed %in% c(unique(hec5q_degday$watershed), zero_watersheds)]
 
 estimate_degday <- monthly_mean_temperature %>%
-  gather(watershed, temp, - date) %>%
   mutate(num_days = days_in_month(date),
-         degdays = temp * num_days,
+         degdays = monthly_mean_temp_c * num_days,
          date = ymd(paste(year(date), month(date), 1, sep = '-'))) %>%
   filter(watershed %in% estimate_watersheds) %>%
   select(date, watershed, degdays)
@@ -112,7 +111,8 @@ deg_days <- zero_degday %>%
   bind_rows(hec5q_degday) %>%
   bind_rows(estimate_degday)
 
-use_data(deg_days)
+View(deg_days)
+use_data(deg_days, overwrite = TRUE)
 
 deg_days %>%
   spread(date, degdays) %>%
