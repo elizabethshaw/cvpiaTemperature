@@ -16,8 +16,7 @@ library(purrr)
 # regression_assignments.csv eq_temp was generated in GerberEQTEMP-61to17.xlsx
 # from a 6-hourly time series in F to a monthly (average) time series, still in
 # F since regression was calibrated using F
-eq_temp <- read_csv('data-raw/mike_wright_temperature_regression/eq_temp.csv') %>%
-  mutate(date = mdy(date))
+eq_temp <- read_csv('data-raw/mike_wright_temperature_regression/eq_temp.csv')
 
 # regression assignments will allow us to identify which parameters each river
 # should use. these assignments were taken from an email dated 04/26/19, which
