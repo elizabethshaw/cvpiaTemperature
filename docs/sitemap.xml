@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://flowwest.github.io/cvpiaTemperature//index.html</loc>
+  </url>
+  <url>
+    <loc>https://flowwest.github.io/cvpiaTemperature//reference/deg_days.html</loc>
+  </url>
+  <url>
+    <loc>https://flowwest.github.io/cvpiaTemperature//reference/delta_temps.html</loc>
+  </url>
+  <url>
+    <loc>https://flowwest.github.io/cvpiaTemperature//reference/juv_temp.html</loc>
+  </url>
+  <url>
+    <loc>https://flowwest.github.io/cvpiaTemperature//reference/prop_temp_over_20_migr_cor.html</loc>
+  </url>
+</urlset>

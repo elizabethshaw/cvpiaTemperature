@@ -1,5 +1,8 @@
+pandoc: 1.19.2.1
+pkgdown: 1.1.0
+pkgdown_sha: ~
+articles: []
 urls:
   reference: https://flowwest.github.io/cvpiaTemperature//reference
   article: https://flowwest.github.io/cvpiaTemperature//articles
-articles: {}
 

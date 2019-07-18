@@ -23,6 +23,16 @@
 #' the period of the CVPIA salmon life cycle model. The few missing values were
 #' imputed using \href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}.
 #'
+#'  \strong{Double Regression Modeling} \cr
+#'  Data from many temperature gauges was collected from several CVPIA watersheds.
+#'  In these watersheds, a double regression technique was employed to predict water
+#'  temperature based on equilibrium temperature and the river mile of interest.
+#'  Equilibrium temperature is the temperature a pool of water would approach if
+#'  left in contact with the air for an infinite time, generally equivalent to the
+#'  air temperature. The results were applied to both watersheds of origin and as
+#'  surrogate data for ungauged watersheds.
+#'
+#'  \href{https://cvpiatemperature-r-package.s3-us-west-2.amazonaws.com/Temperature_Regression_Model_for_CVPIA_Streams.pdf}{Modeling Details}
 #'
 #' \strong{Additional Temperature Modeling} \cr
 #' For streams without major dams, water temperature is highly correlated with air temperature.
@@ -46,36 +56,33 @@
 #'    \item USGS National Water Information System \href{https://waterdata.usgs.gov/nwis}{(NWIS)} accessed using the \href{https://github.com/USGS-R/dataRetrieval}{\code{dataRetrieval}} R package developed by \href{https://www.usgs.gov/}{USGS}.
 #'  }
 #'
-#'  \strong{TODO} \cr
-#'  mike wright's help needed
-#'
 #' @section Watershed Modeling Details:
 #' \itemize{
 #'    \item \strong{Upper Sacramento River} HEC-5Q model output at COTTONWOOD CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
-#'    \item \strong{Antelope Creek} TODO
+#'    \item \strong{Antelope Creek} Regression method was fitted to data from in-river temperature gauges
 #'    \item \strong{Battle Creek} HEC-5Q model output at BATTLE CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
-#'    \item \strong{Bear Creek} TODO
+#'    \item \strong{Bear Creek} Regression method was fitted to data from in-river temperature gauges
 #'    \item \strong{Big Chico Creek} Estimated mean monthly water temperature from a linear model fitted with water temperature data from CDEC Gage ID: \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=BIC}{BIC} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USC00046685/detail}{USC00046685}
 #'    \item \strong{Butte Creek} Estimated mean monthly water temperature from a linear model fitted with water temperature data from CDEC Gage ID: \href{http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=BCD}{BCD} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USC00046685/detail}{USC00046685}
 #'    \item \strong{Clear Creek} HEC-5Q model  output at IGO in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Cottonwood Creek} HEC-5Q model output at COTTONWOOD CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Cow Creek} HEC-5Q model  output at COW CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Deer Creek} Estimated mean monthly water temperature from a linear model fitted with water temperature data from USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11383500}{11383500} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USC00041715/detail}{USC00041715}
-#'    \item \strong{Elder Creek} TODO
+#'    \item \strong{Elder Creek} Regression method was fitted to data from Antelope River temperature gauges
 #'    \item \strong{Mill Creek} Estimated mean monthly water temperature from a linear model fitted with water temperature data from USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11381500}{11381500} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USW00024216/detail}{USW00024216}
-#'    \item \strong{Paynes Creek} Cow Creek temperatue used as surrogate
+#'    \item \strong{Paynes Creek} Regression method was fitted to data from Antelope River temperature gauges
 #'    \item \strong{Stony Creek} HEC-5Q model  output at STONY CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Thomes Creek} HEC-5Q model output at THOMES CR in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Upper-mid Sacramento River} HEC-5Q model output at STONY CREEK in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Sutter Bypass} Tisdale Rotary Screw Trap montly mean water temperature 2011-2017
-#'    \item \strong{Bear River} TODO
-#'    \item \strong{Feather River} TODO
+#'    \item \strong{Bear River} Regression method was fitted to data from Deer Creek temperature gauges
+#'    \item \strong{Feather River} Regression method was fitted to data from Deer Creek temperature gauges
 #'    \item \strong{Yuba River} Estimated mean monthly water temperature from a linear model fitted with water temperature data from USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11421000}{11421000} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USW00024216/detail}{USW00024216}
 #'    \item \strong{Lower-mid Sacramento River} HEC-5Q model output at KNIGHTS LDG in SSJB_SAC_Reference_062315/SAC/SAC_CL_TEMP.DSS
 #'    \item \strong{Yolo Bypass} Knights Landing Rotary Screw Trap montly mean water temperature 2004-2018
 #'    \item \strong{American River} HEC-5Q model output at WILLIAM POND PARK in SSJB_AR_Reference_063015/AR/AR_CL_Temp.dss
 #'    \item \strong{Lower Sacramento River} Measured mean monthly water temperature from  USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11447650}{11447650} with imputed missing values using \href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}
-#'    \item \strong{Calaveras River} TODO
+#'    \item \strong{Calaveras River} Regression method was fitted to data from Deer Creek temperature gauges
 #'    \item \strong{Cosumnes River} Estimated mean monthly water temperature from a linear model fitted with water temperature data from USGS Gage ID: \href{https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=11335000}{11335000} and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USW00023271/detail}{USW00023271}
 #'    \item \strong{Mokelumne River} Estimated mean monthly water temperature from a linear model fitted with water temperature data provided by EBMUD measured near Victor, CA and air temperature data from NOAA CDO Station Id: \href{https://www.ncdc.noaa.gov/cdo-web/datasets/GSOM/stations/GHCND:USC00045032/detail}{USC00045032}
 #'    \item \strong{Merced River} HEC-5Q model output at SANTA FE BR in SSJB_SJR_Reference_062915/SJR/SJR_CL_TEMP.DSS
@@ -87,9 +94,8 @@
 #'
 #' @source
 #' \itemize{
-#'   \item HEC-5Q Model Output and TODO: Michael Wright \email{mwright@@usbr.gov}
+#'   \item HEC-5Q Model Output and Double Regression Temperature Modeling: Michael Wright \email{mwright@@usbr.gov}
 #'   \item Data Wrangling and Additional Temperature Modeling: Sadie Gill  \email{sgill@@flowwest.com}
-#'   \item Temperature Surrogate Selection: Mark Tompkins \email{mtompkins@@flowwest.com} and Mike Urkov \email{mike.urkov@@gmail.com}
 #' }
 #'
 "juv_temp"
@@ -116,9 +122,8 @@
 #'
 #' @source
 #' \itemize{
-#'   \item HEC-5Q Model Output: Michael Wright \email{mwright@@usbr.gov}
+#'   \item HEC-5Q Model Output and Double Regression Temperature Modeling: Michael Wright \email{mwright@@usbr.gov}
 #'   \item Data Wrangling and Additional Temperature Modeling: Sadie Gill  \email{sgill@@flowwest.com}
-#'   \item Temperature Surrogate Selection: Mark Tompkins \email{mtompkins@@flowwest.com} and Mike Urkov \email{mike.urkov@@gmail.com}
 #' }
 #'
 "deg_days"

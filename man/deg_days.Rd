@@ -12,9 +12,8 @@
 }}
 \source{
 \itemize{
-  \item HEC-5Q Model Output: Michael Wright \email{mwright@usbr.gov}
+  \item HEC-5Q Model Output and Double Regression Temperature Modeling: Michael Wright \email{mwright@usbr.gov}
   \item Data Wrangling and Additional Temperature Modeling: Sadie Gill  \email{sgill@flowwest.com}
-  \item Temperature Surrogate Selection: Mark Tompkins \email{mtompkins@flowwest.com} and Mike Urkov \email{mike.urkov@gmail.com}
 }
 }
 \usage{
