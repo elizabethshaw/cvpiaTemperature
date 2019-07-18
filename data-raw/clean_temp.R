@@ -34,6 +34,11 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
+# mike wright has also provided estimates for Antelope Creek, Bear Creek, Elder
+# Creek, Paynes Creek, Bear River, Feather River, and Calaveras River using a
+# regression analysis. More details can be found in
+# 'data-raw/mike_wright_temperature_regression/create_estimated_timeseries.r'
+
 # add additional modeled temperature data from sadie
 monthly_mean_temperature <- temperatures %>%
   group_by(year = year(date), month = month(date), watershed) %>%
@@ -54,14 +59,8 @@ monthly_mean_temperature <- temperatures %>%
   bind_rows(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')) %>%
+  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>%
   spread(watershed, monthly_mean_temp_c) %>%
-  mutate(`Antelope Creek` = `Cow Creek`,
-         `Bear Creek` = `Cow Creek`,
-         `Elder Creek` = `Thomes Creek`,
-         `Paynes Creek` = `Cow Creek`,
-         `Bear River` = `Yuba River`,
-         `Feather River` = `American River`,
-         `Calaveras River` = `Mokelumne River`) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
 juv_temp <- monthly_mean_temperature %>%
@@ -96,9 +95,8 @@ hec5q_degday <- temperatures %>%
 estimate_watersheds <- cvpia_watershed[!cvpia_watershed %in% c(unique(hec5q_degday$watershed), zero_watersheds)]
 
 estimate_degday <- monthly_mean_temperature %>%
-  gather(watershed, temp, - date) %>%
   mutate(num_days = days_in_month(date),
-         degdays = temp * num_days,
+         degdays = monthly_mean_temp_c * num_days,
          date = ymd(paste(year(date), month(date), 1, sep = '-'))) %>%
   filter(watershed %in% estimate_watersheds) %>%
   select(date, watershed, degdays)
@@ -113,7 +111,7 @@ deg_days <- zero_degday %>%
   bind_rows(hec5q_degday) %>%
   bind_rows(estimate_degday)
 
-use_data(deg_days)
+devtools::use_data(deg_days, overwrite = TRUE)
 
 deg_days %>%
   spread(date, degdays) %>%
