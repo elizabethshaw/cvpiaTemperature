@@ -1,5 +1,5 @@
 -----
-<img src="cvpia_logo.png" align="right" width="40%"/>
+<img src="cvpia_logo.jpg" align="right" width="40%"/>
 
 ### Modeled Temperature Data for the CVPIA SIT Model
 
