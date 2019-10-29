@@ -34,6 +34,7 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
+
 # mike wright has also provided estimates for Antelope Creek, Bear Creek, Elder
 # Creek, Paynes Creek, Bear River, Feather River, and Calaveras River using a
 # regression analysis. More details can be found in
@@ -46,7 +47,7 @@ monthly_mean_temperature <- temperatures %>%
   ungroup() %>%
   mutate(cl_date = ymd(paste(year, month, 1, sep = '-'))) %>%
   left_join(cl_dates) %>%
-  filter(between(year(cs_date), 1979, 1999)) %>%
+  filter(between(year(cs_date), 1979, 2000)) %>% # add year here
   mutate(date = ymd(paste(year(cs_date), month(cs_date), 1, sep = '-'))) %>%
   select(date, watershed, monthly_mean_temp_c) %>%
   bind_rows(read_rds('data-raw/big_chico_creek/big_chico_creek_water_temp_c.rds')) %>%
@@ -59,14 +60,20 @@ monthly_mean_temperature <- temperatures %>%
   bind_rows(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')) %>%
-  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>%
+  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>% # updated from mike wright to include 2001
   spread(watershed, monthly_mean_temp_c) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
 juv_temp <- monthly_mean_temperature %>%
   filter(year(date) > 1979)
 
-devtools::use_data(juv_temp, overwrite = TRUE)
+# cofirm each watershed has 2000 as the max year; should be empty
+juv_temp %>%
+  group_by(watershed) %>%
+  summarise(max_year = max(year(date))) %>%
+  filter(max_year != 2000)
+
+usethis::use_data(juv_temp, overwrite = TRUE)
 
 # degree days
 cl_years <- cl_dates %>%
