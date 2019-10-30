@@ -30,7 +30,7 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
   select(-day_month, -year, -`5q_date`) %>%
   gather(watershed, temp_F, -date) %>%
   group_by(date, watershed) %>%
-  summarise(mean_daily_temp_F = mean(temp_F, na.rm = TRUE),
+  dplyr::summarise(mean_daily_temp_F = mean(temp_F, na.rm = TRUE),
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
@@ -43,7 +43,7 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
 # add additional modeled temperature data from sadie
 monthly_mean_temperature <- temperatures %>%
   group_by(year = year(date), month = month(date), watershed) %>%
-  summarise(monthly_mean_temp_c = mean(mean_daily_temp_C)) %>%
+  dplyr::summarise(monthly_mean_temp_c = mean(mean_daily_temp_C)) %>%
   ungroup() %>%
   mutate(cl_date = ymd(paste(year, month, 1, sep = '-'))) %>%
   left_join(cl_dates) %>%
@@ -60,7 +60,7 @@ monthly_mean_temperature <- temperatures %>%
   bind_rows(read_rds('data-raw/yuba_river/yuba_river_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')) %>%
   bind_rows(read_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')) %>%
-  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>% # updated from mike wright to include 2001
+  bind_rows(read_rds('data-raw/mike_wright_temperature_regression/juv_temp_regression.rds')) %>% # updated from mike wright to include 2000
   spread(watershed, monthly_mean_temp_c) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
@@ -70,8 +70,11 @@ juv_temp <- monthly_mean_temperature %>%
 # cofirm each watershed has 2000 as the max year; should be empty
 juv_temp %>%
   group_by(watershed) %>%
-  summarise(max_year = max(year(date))) %>%
-  filter(max_year != 2000)
+  summarise(
+    max_year = max(year(date)),
+    total_obs = n()
+    ) %>%
+  View()
 
 usethis::use_data(juv_temp, overwrite = TRUE)
 
