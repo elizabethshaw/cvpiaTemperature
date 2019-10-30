@@ -40,13 +40,13 @@ antioch2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', dat
                        startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 antioch3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-antioch4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
+antioch6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00040232', datatypeid = 'TAVG',
                         startdate = '2000-01-01', enddate = '2000-12-31', token = token, limit = 12)
 
 antioch1$data %>%
   bind_rows(antioch2$data) %>%
   bind_rows(antioch3$data) %>%
-  bind_rows(antioch4$data) %>%
+  bind_rows(antioch6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   ggplot(aes(x = date, y = value)) +
   geom_col()
@@ -94,7 +94,7 @@ summary(north_delta_temp_model)
 north_delta_air_temp <- antioch1$data %>%
   bind_rows(antioch2$data) %>%
   bind_rows(antioch3$data) %>%
-  bind_rows(antioch4$data) %>%
+  bind_rows(antioch6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value) %>%
   bind_rows(
@@ -129,5 +129,7 @@ north_delta_water_temp_c %>%
   geom_hline(yintercept = 18, size = .2) +
   geom_hline(yintercept = 20, size = .2) +
   theme_minimal()
+
+north_delta_water_temp_c$date %>% range()
 
 write_rds(north_delta_water_temp_c, 'data-raw/deltas/north_delta_water_temp_c.rds')
