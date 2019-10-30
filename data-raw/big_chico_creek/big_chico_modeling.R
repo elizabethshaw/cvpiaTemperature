@@ -5,7 +5,7 @@ library(CDECRetrieve)
 library(forecast)
 
 # # big chico BIC cdec query ----------------
-bic <- cdec_query(stations = 'BIC', sensor_num = '25', dur_code = 'H',
+bic <- cdec_query(station = 'BIC', sensor_num = '25', dur_code = 'H',
            start_date = '1998-09-10', end_date = '2014-12-01')
 
 # rnoaa query ----------------
@@ -112,8 +112,10 @@ confusionMatrix(xtab)
 paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
   bind_rows(paradise5$data) %>%
+  bind_rows(paradise1$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
+  filter(date <= "2000-12-01") %>% # paradise 1 extends to 2008, cut off this here
   bind_rows(
     tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
            mean_air_temp_c = 0)
@@ -124,13 +126,13 @@ paradise_air_temp <- paradise3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
+ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(2000, 12), frequency = 12)
 
 na.interp(ts_paradise) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_paradise, series = 'Original')
 
 big_chico_air_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_paradise)))
 
 
@@ -144,7 +146,7 @@ paradise_air_temp %>%
 big_chico_pred_water_temp <- predict(big_chico_temp_model, big_chico_air_temp_c)
 
 big_chico_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Big Chico Creek',
   monthly_mean_temp_c = big_chico_pred_water_temp)
 
