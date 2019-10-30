@@ -80,10 +80,14 @@ sac4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatyp
 sac5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
 
+sac6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023271', datatypeid = 'TAVG',
+                    startdate = '2000-01-01', enddate = '2000-12-31', limit = 120, token = token)
+
 
 sac3$data %>%
   bind_rows(sac4$data) %>%
   bind_rows(sac5$data) %>%
+  bind_rows(sac6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
@@ -92,14 +96,17 @@ sac3$data %>%
 sac <- sac3$data %>%
   bind_rows(sac4$data) %>%
   bind_rows(sac5$data) %>%
+  bind_rows(sac6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value)
 
 cosum_predicted_water_temp <- predict(cosum_temp_model, sac)
 
 cosumnes_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Cosumnes River',
   monthly_mean_temp_c = cosum_predicted_water_temp)
+
+cosumnes_water_temp_c$date %>% range()
 
 write_rds(cosumnes_water_temp_c, 'data-raw/cosumnes_river/cosumnes_water_temp_c.rds')
