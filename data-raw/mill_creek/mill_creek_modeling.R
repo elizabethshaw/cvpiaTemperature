@@ -73,10 +73,13 @@ red_bluff4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', d
                          startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 red_bluff5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
                           startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
+red_bluff6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                          startdate = '2000-01-01', enddate = '2000-12-31', token = token, limit = 12)
 
 red_bluff3$data %>%
   bind_rows(red_bluff4$data) %>%
   bind_rows(red_bluff5$data) %>%
+  bind_rows(red_bluff6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
@@ -88,7 +91,7 @@ red_bluff <- red_bluff3$data %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
            mean_air_temp_c = 0)
   ) %>%
   group_by(date) %>%
@@ -97,13 +100,13 @@ red_bluff <- red_bluff3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_red_bluff <- ts(red_bluff$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
+ts_red_bluff <- ts(red_bluff$mean_air_temp_c, start = c(1979, 1), end = c(2000, 12), frequency = 12)
 
 na.interp(ts_red_bluff) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_red_bluff, series = 'Original')
 
 mill_air_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_red_bluff)))
 
 
@@ -117,7 +120,7 @@ mill_air_temp_c %>%
 mill_pred_water_temp <- predict(mill_temp_model, mill_air_temp_c)
 
 mill_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Mill Creek',
   monthly_mean_temp_c = mill_pred_water_temp)
 
