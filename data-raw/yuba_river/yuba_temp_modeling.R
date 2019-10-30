@@ -77,6 +77,7 @@ yuba %>%
   geom_point()
 
 yuba_temp_model <- lm(mean_water_temp_c ~ mean_air_temp_c, data = yuba)
+
 summary(yuba_temp_model)
 yuba3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
                      startdate = '1979-01-01', enddate = '1979-12-31', token = token, limit = 12)
@@ -84,15 +85,17 @@ yuba4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', dataty
                      startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 yuba5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-
+yuba6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00024216', datatypeid = 'TAVG',
+                     startdate = '2000-01-01', enddate = '2000-12-31', token = token, limit = 12)
 
 yuba_at <- yuba3$data %>%
   bind_rows(yuba4$data) %>%
   bind_rows(yuba5$data) %>%
+  bind_rows(yuba6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
            mean_air_temp_c = 0)
   ) %>%
   group_by(date) %>%
@@ -101,13 +104,13 @@ yuba_at <- yuba3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_yuba_at <- ts(yuba_at$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
+ts_yuba_at <- ts(yuba_at$mean_air_temp_c, start = c(1979, 1), end = c(2000, 12), frequency = 12)
 
 na.interp(ts_yuba_at) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_yuba_at, series = 'Original')
 
 yuba_air_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_yuba_at)))
 
 
@@ -121,7 +124,7 @@ yuba_air_temp_c %>%
 yuba_pred_water_temp <- predict(yuba_temp_model, yuba_air_temp_c)
 
 yuba_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Yuba River',
   monthly_mean_temp_c = yuba_pred_water_temp)
 
