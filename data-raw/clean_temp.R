@@ -30,7 +30,7 @@ temperatures <- read_csv('data-raw/tempmaster.csv', skip = 1) %>%
   select(-day_month, -year, -`5q_date`) %>%
   gather(watershed, temp_F, -date) %>%
   group_by(date, watershed) %>%
-  dplyr::summarise(mean_daily_temp_F = mean(temp_F, na.rm = TRUE),
+  summarise(mean_daily_temp_F = mean(temp_F, na.rm = TRUE),
             mean_daily_temp_C = (mean_daily_temp_F - 32) * (5/9)) %>%
   ungroup()
 
@@ -71,6 +71,7 @@ juv_temp <- monthly_mean_temperature %>%
 juv_temp %>%
   group_by(watershed) %>%
   summarise(
+    min_year = min(year(date)),
     max_year = max(year(date)),
     total_obs = n()
     ) %>%
