@@ -148,4 +148,4 @@ delta_temps <- dn %>%
   left_join(ds) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
-use_data(delta_temps)
+usethis::use_data(delta_temps, overwrite = TRUE)
