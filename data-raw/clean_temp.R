@@ -98,7 +98,7 @@ hec5q_degday <- temperatures %>%
   summarise(degdays = sum(mean_daily_temp_C, na.rm = TRUE)) %>%
   ungroup() %>%
   left_join(cl_years) %>%
-  filter(between(cs_year, 1979, 1999)) %>%
+  filter(between(cs_year, 1979, 2000)) %>%
   mutate(date = ymd(paste(cs_year, month, 1, sep = '-'))) %>%
   select(date, watershed, degdays)
 
@@ -113,8 +113,8 @@ estimate_degday <- monthly_mean_temperature %>%
   select(date, watershed, degdays)
 
 zero_degday <- tibble(
-  date = rep(seq(as.Date('1979-01-01'), as.Date('1999-12-01'), by = 'month'), each = 6),
-  watershed = rep(zero_watersheds, times = 252),
+  date = rep(seq(as.Date('1979-01-01'), as.Date('2000-12-01'), by = 'month'), each = 6),
+  watershed = rep(zero_watersheds, times = 264),
   degdays = as.numeric(NA)
 )
 
@@ -122,7 +122,7 @@ deg_days <- zero_degday %>%
   bind_rows(hec5q_degday) %>%
   bind_rows(estimate_degday)
 
-devtools::use_data(deg_days, overwrite = TRUE)
+usethis::use_data(deg_days, overwrite = TRUE)
 
 deg_days %>%
   spread(date, degdays) %>%
@@ -148,4 +148,4 @@ delta_temps <- dn %>%
   left_join(ds) %>%
   gather(watershed, monthly_mean_temp_c, -date)
 
-use_data(delta_temps)
+usethis::use_data(delta_temps, overwrite = TRUE)
