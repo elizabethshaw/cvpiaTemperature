@@ -66,9 +66,13 @@ lodi4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', dataty
 lodi5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
                      startdate = '1990-01-01', enddate = '1999-12-31', limit = 120, token = token)
 
+lodi6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00045032', datatypeid = 'TAVG',
+                     startdate = '2000-01-01', enddate = '2000-12-31', limit = 12, token = token)
+
 lodi3$data %>%
   bind_rows(lodi4$data) %>%
   bind_rows(lodi5$data) %>%
+  bind_rows(lodi6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   ggplot(aes(x = date, y = mean_air_temp_c)) +
@@ -78,10 +82,11 @@ lodi3$data %>%
 lodi_air_temp <- lodi3$data %>%
   bind_rows(lodi4$data) %>%
   bind_rows(lodi5$data) %>%
+  bind_rows(lodi6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
-    tibble(date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+    tibble(date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
            mean_air_temp_c = 0)
   ) %>%
   group_by(date) %>%
@@ -90,13 +95,13 @@ lodi_air_temp <- lodi3$data %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
 
-ts_lodi <- ts(lodi_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
+ts_lodi <- ts(lodi_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(2000, 12), frequency = 12)
 
 na.interp(ts_lodi) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_lodi, series = 'Original')
 
 moke_air_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_lodi))) %>%
   mutate(early = ifelse(month(date) > 8, TRUE, FALSE))
 
@@ -110,7 +115,7 @@ moke_air_temp_c %>%
 moke_predicted_water_temp <- predict(moke_temp_model, moke_air_temp_c)
 
 moke_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Mokelumne River',
   monthly_mean_temp_c = moke_predicted_water_temp)
 

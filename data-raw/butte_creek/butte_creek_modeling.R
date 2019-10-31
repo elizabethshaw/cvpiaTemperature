@@ -8,7 +8,7 @@ library(caret)
 
 # hourly water temperature data on butte creek near durham (fahrenheit)
 #07/29/1998 to present
-bcd <- CDECRetrieve::cdec_query(stations = 'BCD', sensor_num = '25', dur_code = 'H',
+bcd <- CDECRetrieve::cdec_query(station = 'BCD', sensor_num = '25', dur_code = 'H',
                                            start_date = '1998-09-16', end_date = '2017-09-30')
 
 # bcd = durham
@@ -76,9 +76,14 @@ paradise4 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', st
 
 paradise5 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '1990-01-01',
                         datatypeid = 'TAVG', enddate = '1999-12-31', token = token, limit = 120)
+
+paradise6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USC00046685', startdate = '2000-01-01',
+                         datatypeid = 'TAVG', enddate = '2000-12-31', token = token, limit = 120)
+
 paradise3$data %>%
   bind_rows(paradise4$data) %>%
   bind_rows(paradise5$data) %>%
+  bind_rows(paradise6$data) %>%
   mutate(date = ymd_hms(date), year = year(date),
          month = factor(month.abb[month(date)],
                         levels = c(month.abb[10:12], month.abb[1:9]), ordered = TRUE)) %>%
@@ -92,6 +97,7 @@ paradise3$data %>%
 paradise_air_temp <- paradise3$data %>%
   bind_rows(paradise4$data) %>%
   bind_rows(paradise5$data) %>%
+  bind_rows(paradise6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, mean_air_temp_c = value) %>%
   bind_rows(
@@ -103,14 +109,16 @@ paradise_air_temp <- paradise3$data %>%
   ungroup() %>%
   mutate(mean_air_temp_c = ifelse(mean_air_temp_c == 0, NA, mean_air_temp_c))
 
+paradise_air_temp$date %>% range()
 
-ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(1999, 12), frequency = 12)
+
+ts_paradise <- ts(paradise_air_temp$mean_air_temp_c, start = c(1979, 1), end = c(2000, 12), frequency = 12)
 
 na.interp(ts_paradise) %>% autoplot(series = 'Interpolated') +
   forecast::autolayer(ts_paradise, series = 'Original')
 
 butte_air_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   mean_air_temp_c = as.numeric(na.interp(ts_paradise)))
 
 
@@ -124,12 +132,14 @@ paradise_air_temp %>%
 butte_pred_water_temp <- predict(butte_model, butte_air_temp_c)
 
 butte_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   watershed = 'Butte Creek',
   monthly_mean_temp_c = butte_pred_water_temp)
 
 butte_water_temp_c %>%
   ggplot(aes(x = date)) +
   geom_col(aes(y = monthly_mean_temp_c))
+
+butte_water_temp_c$date %>% range()
 
 write_rds(butte_water_temp_c, 'data-raw/butte_creek/butte_creek_water_temp_c.rds')

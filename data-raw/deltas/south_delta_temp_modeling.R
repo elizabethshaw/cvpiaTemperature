@@ -4,7 +4,7 @@ library(CDECRetrieve)
 library(rnoaa)
 
 # CDEC water temperature on middle river at tracy blvd---------------------
-middle_river <- cdec_query(stations = 'MTB', sensor_num = '25', dur_code = 'E',
+middle_river <- cdec_query(station = 'MTB', sensor_num = '25', dur_code = 'E',
                            start_date = '2002-10-30', end_date = '2017-12-31')
 
 glimpse(middle_river)
@@ -64,7 +64,8 @@ stockton_airport2 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023
                                 startdate = '1980-01-01', enddate = '1989-12-31', token = token, limit = 130)
 stockton_airport3 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
                                  startdate = '1990-01-01', enddate = '1999-12-31', token = token, limit = 130)
-
+stockton_airport6 <- rnoaa::ncdc(datasetid = 'GSOM', stationid = 'GHCND:USW00023237', datatypeid = 'TAVG',
+                                 startdate = '2000-01-01', enddate = '2000-12-31', token = token, limit = 130)
 stockton_airport1$data %>%
   bind_rows(stockton_airport2$data) %>%
   bind_rows(stockton_airport3$data) %>%
@@ -113,14 +114,17 @@ summary(temp_model)
 south_delta_air_temp_c <- stockton_airport1$data %>%
   bind_rows(stockton_airport2$data) %>%
   bind_rows(stockton_airport3$data) %>%
+  bind_rows(stockton_airport6$data) %>%
   mutate(date = as_date(ymd_hms(date))) %>%
   select(date, air_temp_c = value)
+
+south_delta_air_temp_c$date %>% range()
 
 # use air temp to predict water temp---------
 south_delta_water_temp_pred <- predict(temp_model, south_delta_air_temp_c)
 
 south_delta_water_temp_c <- tibble(
-  date = seq.Date(ymd('1979-01-01'), ymd('1999-12-01'), by = 'month'),
+  date = seq.Date(ymd('1979-01-01'), ymd('2000-12-01'), by = 'month'),
   `South Delta` = south_delta_water_temp_pred)
 
 south_delta_water_temp_c %>%

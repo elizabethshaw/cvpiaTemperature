@@ -110,7 +110,7 @@ yolo_water_temp <- read_csv('data-raw/yolo/cleaned_yolo_water_temp04_18.csv') %>
   arrange(month)
 
 tibble(
-  date = seq(as.Date('1980-01-01'), as.Date('1999-12-31'), by = 'month'),
+  date = seq(as.Date('1980-01-01'), as.Date('2000-12-31'), by = 'month'),
   watershed = 'Yolo Bypass',
-  monthly_mean_temp_c = rep(yolo_water_temp$mean_temp_c, times = 20)
+  monthly_mean_temp_c = rep(yolo_water_temp$mean_temp_c, times = 21)
 ) %>% write_rds('data-raw/yolo/yolo_bypass_water_temp_c.rds')

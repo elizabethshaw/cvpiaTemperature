@@ -57,7 +57,7 @@ sutter_water_temp <- read_csv('data-raw/sutter/cleaned_sutter_water_temp11_16.cs
   summarise(mean_temp_c = mean(water_temp_c, na.rm = TRUE))
 
 tibble(
-  date = seq(as.Date('1980-01-01'), as.Date('1999-12-31'), by = 'month'),
+  date = seq(as.Date('1980-01-01'), as.Date('2000-12-31'), by = 'month'),
   watershed = 'Sutter Bypass',
-  monthly_mean_temp_c = rep(sutter_water_temp$mean_temp_c, times = 20)
+  monthly_mean_temp_c = rep(sutter_water_temp$mean_temp_c, times = 21)
 ) %>% write_rds('data-raw/sutter/sutter_bypass_water_temp_c.rds')
