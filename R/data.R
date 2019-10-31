@@ -1,16 +1,16 @@
 #' Monthly Mean Water Temperature
 #' @description A dataset containing the monthly mean water temperature in
-#' celsius for each CVPIA watershed 1980-1999.
+#' celsius for each CVPIA watershed 1980-2000.
 #'
 #' @format dataframe with 7,440 rows and 3 variables
 #' \describe{
-#'  \item{date}{calendar date, monthly value 1980-1999}
+#'  \item{date}{calendar date, monthly value 1980-2000}
 #'  \item{watershed}{CVPIA watershed name}
 #'  \item{monthly_mean_temp_c}{modeled monthly mean temperature in °C}
 #'  }
 #'
 #' @details The following four methods were used to estimate the monthly mean water
-#' temperature for the watersheds during 1980-1999:
+#' temperature for the watersheds during 1980-2000:
 #'
 #'
 #' \strong{HEC-5Q} \cr
@@ -41,7 +41,7 @@
 #'
 #' Generally, the air temperature record spans both the period of the CVPIA salmon life cycle model
 #' and the complete period of record of available water temperature data. In the
-#' cases where there were missing air temperature values between 1980-1999, we imputed the missing values using
+#' cases where there were missing air temperature values between 1980-2000, we imputed the missing values using
 #' \href{https://www.rdocumentation.org/packages/forecast/versions/8.1/topics/na.interp}{\code{forecast::na.interp}}
 #' in order to have a complete air temperature dataset for water temperature estimation.
 #'
@@ -106,7 +106,7 @@
 #'
 #' @format dataframe with 7,812 rows and 3 variables
 #' \describe{
-#'   \item{date}{calendar date, monthly value 1979-1999}
+#'   \item{date}{calendar date, monthly value 1979-2000}
 #'   \item{watershed}{CVPIA watershed name}
 #'   \item{degdays}{monthly ATU in °C}
 #' }
@@ -134,7 +134,7 @@
 #'
 #' @format dataframe with 504 rows and 3 variables
 #' \describe{
-#'   \item{date}{calendar date, monthly value 1980-1999}
+#'   \item{date}{calendar date, monthly value 1980-2000}
 #'   \item{watershed}{CVPIA watershed name}
 #'   \item{monthly_mean_temp_c}{modeled monthly mean temperature in °C}
 #' }
