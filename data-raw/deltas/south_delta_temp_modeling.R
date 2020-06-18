@@ -4,7 +4,7 @@ library(CDECRetrieve)
 library(rnoaa)
 
 # CDEC water temperature on middle river at tracy blvd---------------------
-middle_river <- cdec_query(stations = 'MTB', sensor_num = '25', dur_code = 'E',
+middle_river <- cdec_query(station = 'MTB', sensor_num = '25', dur_code = 'E',
                            start_date = '2002-10-30', end_date = '2017-12-31')
 
 glimpse(middle_river)
