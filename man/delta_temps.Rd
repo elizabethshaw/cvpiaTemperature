@@ -4,12 +4,14 @@
 \name{delta_temps}
 \alias{delta_temps}
 \title{Delta Temperature}
-\format{dataframe with 504 rows and 3 variables
+\format{
+dataframe with 504 rows and 3 variables
 \describe{
   \item{date}{calendar date, monthly value 1980-1999}
   \item{watershed}{CVPIA watershed name}
   \item{monthly_mean_temp_c}{modeled monthly mean temperature in °C}
-}}
+}
+}
 \source{
 Data Wrangling and Additional Temperature Modeling: Sadie Gill  \email{sgill@flowwest.com}
 }

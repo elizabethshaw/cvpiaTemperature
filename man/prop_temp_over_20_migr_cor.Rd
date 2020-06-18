@@ -4,13 +4,15 @@
 \name{prop_temp_over_20_migr_cor}
 \alias{prop_temp_over_20_migr_cor}
 \title{Migratory Corridor Water Temperature}
-\format{dataframe with 300 rows and 4 variables
+\format{
+dataframe with 300 rows and 4 variables
 \describe{
   \item{order}{ordering of watersheds within salmon life cycle model}
   \item{watershed}{CVPIA watershed}
   \item{month}{integer representation of calendar month}
   \item{median_p20}{median proportion of temperature over 20°C}
-}}
+}
+}
 \source{
 Sadie Gill \email{sgill@flowwest.com}
 }

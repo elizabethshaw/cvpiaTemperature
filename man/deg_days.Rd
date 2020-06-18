@@ -4,12 +4,14 @@
 \name{deg_days}
 \alias{deg_days}
 \title{Degree Days}
-\format{dataframe with 7,812 rows and 3 variables
+\format{
+dataframe with 7,812 rows and 3 variables
 \describe{
   \item{date}{calendar date, monthly value 1979-1999}
   \item{watershed}{CVPIA watershed name}
   \item{degdays}{monthly ATU in °C}
-}}
+}
+}
 \source{
 \itemize{
   \item HEC-5Q Model Output and Double Regression Temperature Modeling: Michael Wright \email{mwright@usbr.gov}
