@@ -1,7 +1,5 @@
 -----
 
-Hi its me Lizzy 
-
 <img src="cvpia_logo.jpg" align="right" width="40%"/>
 
 ### Modeled Temperature Data for the CVPIA SIT Model
