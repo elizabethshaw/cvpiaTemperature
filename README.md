@@ -1,6 +1,6 @@
 -----
 
-Hi its me Lizzy 
+Hi its me Lizzy!
 
 <img src="cvpia_logo.jpg" align="right" width="40%"/>
 
